@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=FlClash
+Comment=Multi-platform proxy client
+Exec=flclash %u
+Icon=flclash
+Categories=Network;
+Keywords=Clash;ClashMeta;Proxy;
+StartupNotify=true
+Terminal=false
+MimeType=x-scheme-handler/http;x-scheme-handler/https;

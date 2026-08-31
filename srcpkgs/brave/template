@@ -1,0 +1,50 @@
+# Template file for 'brave'
+pkgname=brave
+version=1.94.117
+revision=1
+archs="x86_64 aarch64"
+depends="vulkan-loader"
+short_desc="Web browser that blocks ads and trackers by default"
+maintainer="LyargoOS <your@email.com>"
+license="MPL-2.0"
+homepage="https://brave.com"
+changelog="https://raw.githubusercontent.com/brave/brave-browser/refs/heads/master/CHANGELOG_DESKTOP.md"
+case "$XBPS_TARGET_MACHINE" in
+	x86_64)  distfiles="https://github.com/brave/brave-browser/releases/download/v${version}/brave-browser-${version}-linux-amd64.zip"
+		 checksum=865ff352311c57ba4639b5198bc89e92a838a57bff44182e3b9bb3980913a84d ;;
+	aarch64) distfiles="https://github.com/brave/brave-browser/releases/download/v${version}/brave-browser-${version}-linux-arm64.zip"
+		 checksum=fca88277fefc4deb24c6974810466c6be5363caf4a6f03c78de3f6db3eb654d5 ;;
+esac
+nostrip=yes
+skiprdeps="/opt/brave/libqt5_shim.so /opt/brave/libqt6_shim.so"
+
+do_install() {
+	vmkdir opt/brave
+	vcopy "*" opt/brave
+
+	rm -f ${DESTDIR}/opt/brave/libvulkan.so.1
+	rm -f ${DESTDIR}/opt/brave/default-app-block
+	rm -rf ${DESTDIR}/opt/brave/cron
+	rm -rf ${DESTDIR}/opt/brave/MEIPreload
+	rm -rf ${DESTDIR}/opt/brave/PrivacySandboxAttestationsPreloaded
+
+	chmod 4755 ${DESTDIR}/opt/brave/chrome-sandbox
+
+	vbin ${FILESDIR}/brave-browser.sh brave
+	vinstall ${FILESDIR}/brave-browser.desktop 644 usr/share/applications
+
+	# Install icons from upstream PNGs
+	for size in 16 24 32 48 64 128 256; do
+		if [ -f "product_logo_${size}.png" ]; then
+			vinstall "product_logo_${size}.png" 644 \
+				usr/share/icons/hicolor/${size}x${size}/apps brave-desktop.png
+		fi
+	done
+
+	# Install custom SVG icon
+	vinstall ${FILESDIR}/brave-browser.svg 644 usr/share/icons/hicolor/scalable/apps brave-desktop.svg
+}
+
+brave_package() {
+	:
+}

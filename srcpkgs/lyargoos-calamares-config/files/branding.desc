@@ -1,0 +1,25 @@
+---
+strings:
+  productName:         "LyargoOS"
+  shortProductName:    "LyargoOS"
+  version:             "2024.1"
+  shortVersion:        "2024.1"
+  versionedName:       "LyargoOS 2024.1"
+  shortVersionedName:  "LyargoOS 2024.1"
+  productUrl:          "https://github.com/lyargoos"
+  supportUrl:          "https://docs.voidlinux.org"
+  knownIssuesUrl:      "https://github.com/lyargoos/issues"
+  releaseNotesUrl:     "https://github.com/lyargoos/releases"
+  donateUrl:           ""
+  productLogo:         "/usr/share/pixmaps/lyargoos-logo.svg"
+  productIcon:         "/usr/share/pixmaps/lyargoos-logo.svg"
+  productWallpaper:    "/usr/share/wallpapers/LyargoOS-Dark/contents/images/7680x2160.jpg"
+
+images:
+  productBanner:       "/usr/share/pixmaps/lyargoos-logo.svg"
+  productScreenshot:   "/usr/share/pixmaps/lyargoos-logo.svg"
+  productLogo:         "/usr/share/pixmaps/lyargoos-logo.svg"
+  productIcon:         "/usr/share/pixmaps/lyargoos-logo.svg"
+  productWallpaper:    "/usr/share/wallpapers/LyargoOS-Dark/contents/images/7680x2160.jpg"
+
+slideshow: "file:///usr/share/calamares/slideshow/show.html"

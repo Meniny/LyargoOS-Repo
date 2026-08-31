@@ -1,0 +1,43 @@
+# Template file for 'lyargoos-artwork'
+pkgname=lyargoos-artwork
+version=0.1
+revision=1
+build_style=gnu-makefile
+short_desc="LyargoOS artwork — wallpapers, logos, splash screen"
+maintainer="LyargoOS <your@email.com>"
+license="CC-BY-4.0"
+homepage="https://github.com/Meniny/LyargoOS-Artworks"
+distfiles="https://github.com/Meniny/LyargoOS-Artworks/archive/refs/tags/v${version}.tar.gz"
+checksum=753e143da13d0f93b23b6e011d4c853a4f42975a28ce7e712f02c7f96d279c51
+wrksrc="LyargoOS-Artworks-${version}"
+nostrip=yes
+
+do_build() {
+	:
+}
+
+do_install() {
+	# Plasma wallpapers (installed to /usr/share/wallpapers/)
+	if [ -d wallpapers-plasma ]; then
+		vmkdir usr/share/wallpapers
+		cp -a wallpapers-plasma/* ${DESTDIR}/usr/share/wallpapers/
+	fi
+
+	# Logos
+	if [ -d logos ]; then
+		vmkdir usr/share/pixmaps
+		for f in logos/*; do
+			[ -f "$f" ] || continue
+			install -m644 "$f" ${DESTDIR}/usr/share/pixmaps/
+		done
+	fi
+
+	# Splash screen
+	if [ -d splash ]; then
+		vmkdir usr/share/lyargoos/splash
+		for f in splash/*; do
+			[ -f "$f" ] || continue
+			install -m644 "$f" ${DESTDIR}/usr/share/lyargoos/splash/
+		done
+	fi
+}

@@ -63,30 +63,86 @@ To use custom SVG icons for apps (instead of upstream PNGs), place your SVG file
 vinstall ${FILESDIR}/brave.svg 644 usr/share/icons/hicolor/scalable/apps brave-desktop.svg
 ```
 
-## Hosting the Repository
+## Sign Packages and Publish
 
-### Sign packages
+### References
 
-```bash
-# Generate a signing key (one-time)
-openssl genpkey -algorithm ed25519 -out repo.key
+- [xbps-rindex(1) man page](https://man.voidlinux.org/xbps-rindex.1) — official documentation for repository management and signing
+- [XBPS Repositories](https://docs.voidlinux.org/xbps/repositories/index.html) — Void Linux repository documentation
 
-# Sign all packages
-xbps-rindex --sign -s "your-repo-name" hostdir/binpkgs/
+### Generate Keys (one-time setup)
 
-# Generate index
-xbps-rindex -a hostdir/binpkgs/
+```sh
+mkdir -p staging
+
+# Generate private RSA key
+ssh-keygen -t rsa -b 4096 -m PEM -f private.pem
+# Leave empty for no passphrase
+
+# Extract public key
+openssl rsa -in staging/private.pem -pubout -out staging/LyargoOS.pub
+
+# Copy public key to ISO builder so XBPS trusts our repo
+mkdir -p ../lyargoos/overlay/common/etc/xbps.d/
+cp staging/LyargoOS.pub ../lyargoos/overlay/common/etc/xbps.d/
+
+# DO NOT COMMIT PRIVATE KEY
+echo "staging/private.pem" >> .gitignore
+echo "staging/" >> .gitignore
 ```
 
-### Upload to GitHub Releases
+### Sign and Index Packages
 
-1. Create a GitHub release in this repo
-2. Upload all `.xbps` files from `hostdir/binpkgs/` as release assets
-3. The repo URL for users will be: `https://github.com/Meniny/LyargoOS-Repo/releases/latest/download`
+```sh
+cd staging
+
+# 1. Create package index for x86_64
+xbps-rindex -a *.xbps
+
+# 2. Create package index for aarch64 (if any exist)
+if ls *.aarch64.xbps 1>/dev/null 2>&1; then
+    XBPS_ARCH=aarch64 xbps-rindex -a *.aarch64.xbps
+fi
+
+# 3. Initialize signed repository (adds signing metadata)
+xbps-rindex --private private.pem --sign --signedby "LyargoOS" $PWD
+
+# 4. Sign all packages (both x86_64 and aarch64)
+xbps-rindex --private private.pem --sign-pkg $PWD/*.xbps
+```
+
+### Publish to GitHub Releases
+
+Use the provided script (run without arguments for interactive mode):
+
+```sh
+# Interactive mode - prompts for mode, tag, title, and notes
+./publish.sh
+
+# Or provide arguments directly
+# Create new tag and release
+./publish.sh -n v0.1 "v0.1 - Initial packages" "Initial package set for LyargoOS"
+
+# Delete and recreate release only (keeps existing git tag)
+./publish.sh -r v0.1 "v0.1 - Updated packages" "Rebuilt packages"
+
+# Delete and recreate both tag and release
+./publish.sh -R v0.2 "v0.2 - New release" "New tag and release"
+```
+
+### Files to Upload
+
+- All `.xbps` files (binary packages)
+- All `.sig2` files (package signatures)
+- `x86_64-repodata` (package index)
+- `aarch64-repodata` (if you have aarch64 packages)
+- `LyargoOS.pub` (public key for verification)
+
+**DO NOT upload `private.pem`!**
 
 ### Or host on your own server
 
-Serve the `hostdir/binpkgs/` directory via static HTTP. Any web server works (nginx, Caddy, GitHub Pages, Cloudflare R2, etc.).
+Serve the `staging/` directory via static HTTP. Any web server works (nginx, Caddy, GitHub Pages, Cloudflare R2, etc.).
 
 ## Adding the Repo to LyargoOS
 
@@ -100,11 +156,51 @@ REPOS=(
 
 Then add packages to `EXTRA_PACKAGES` or to flavor-specific `FLAVOR_PKGS`.
 
+## Mirror Configuration
+
+The default Void mirror (`repo-default.voidlinux.org`) may be slow depending on your location. Use `mirror.sh` to switch to a faster mirror for package builds.
+
+### Quick Method
+
+```bash
+# Interactive menu
+./mirror.sh
+
+# Or specify directly
+./mirror.sh https://mirrors.tuna.tsinghua.edu.cn/voidlinux
+```
+
+### Common Mirrors
+
+**China:**
+- Tsinghua: `https://mirrors.tuna.tsinghua.edu.cn/voidlinux`
+- Aliyun: `https://mirrors.aliyun.com/voidlinux`
+- USTC: `https://mirrors.ustc.edu.cn/voidlinux`
+
+**United States:**
+- Clarkson: `https://mirror.clarkson.edu/voidlinux`
+- OCF Berkeley: `https://mirrors.ocf.berkeley.edu/voidlinux`
+
+**Europe:**
+- Leaseweb DE: `https://mirror.de.leaseweb.net/voidlinux`
+- Leaseweb NL: `https://mirror.nl.leaseweb.net/voidlinux`
+
+**Official:** `https://repo-default.voidlinux.org`
+
+More mirrors: https://voidlinux.org/download/
+
+### Manual Method
+
+Edit `void-packages/etc/xbps.d/repos-remote*.conf` and replace `repo-default.voidlinux.org` with your preferred mirror.
+
 ## Repository Structure
 
 ```
 lyargoos-repo/
 ├── README.md
+├── build.sh                # Build packages via void-packages
+├── mirror.sh               # Switch XBPS mirror
+├── publish.sh              # Sign packages and publish to GitHub Releases
 ├── srcpkgs/
 │   ├── brave/
 │   │   ├── template
@@ -126,6 +222,7 @@ lyargoos-repo/
 │   │   └── files/          # Calamares settings, branding, module configs
 │   └── lyargoos-kde-theme/
 │       └── template        # Fetches from LyargoOS-Artworks repo
+└── void-packages/          # Submodule
 ```
 
 ## Notes

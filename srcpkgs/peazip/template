@@ -1,0 +1,55 @@
+# Template file for 'peazip'
+pkgname=peazip
+version=11.2.0
+revision=1
+archs="x86_64 aarch64"
+build_style=fetch
+short_desc="Free file archiver and compressor with broad format support"
+maintainer="LyargoOS <your@email.com>"
+license="LGPL-3.0-only"
+homepage="https://peazip.github.io/"
+case "$XBPS_TARGET_MACHINE" in
+	x86_64)  distfiles="https://github.com/peazip/PeaZip/releases/download/${version}/peazip_portable-${version}.LINUX.Qt6.x86_64.tar.gz"
+		 checksum=e81f46854e0cf192f9eea3c51b41937ae308981f3849b8242503a77dd04bbdac ;;
+	aarch64) distfiles="https://github.com/peazip/PeaZip/releases/download/${version}/peazip_portable-${version}.LINUX.GTK2.aarch64.tar.gz"
+		 checksum=5df50aa3c1b15684d11845baf133ea30f0e084e5abc5bad5d252e04b80629feb ;;
+esac
+nostrip=yes
+
+do_install() {
+	vmkdir opt/peazip
+	vmkdir usr/bin
+	cd ${wrksrc}
+	vcopy "*" opt/peazip
+
+	# Install wrapper to make it available in PATH
+	cat > ${DESTDIR}/usr/bin/peazip << 'WRAPPER'
+#!/bin/sh
+exec /opt/peazip/peazip "$@"
+WRAPPER
+	chmod 755 ${DESTDIR}/usr/bin/peazip
+
+	# Install desktop file from bundled resources
+	if [ -f "${DESTDIR}/opt/peazip/res/share/batch/freedesktop_integration/peazip.desktop" ]; then
+		vinstall "${DESTDIR}/opt/peazip/res/share/batch/freedesktop_integration/peazip.desktop" 644 \
+			usr/share/applications
+	elif [ -f "${FILESDIR}/peazip.desktop" ]; then
+		vinstall ${FILESDIR}/peazip.desktop 644 usr/share/applications
+	fi
+
+	# Install icons from bundled resources
+	if [ -d "${DESTDIR}/opt/peazip/res/share/icons" ]; then
+		for f in ${DESTDIR}/opt/peazip/res/share/icons/*.png; do
+			[ -f "$f" ] || continue
+			_name=$(basename "$f")
+			case "$_name" in
+				16x16*)   vinstall "$f" 644 usr/share/icons/hicolor/16x16/apps peazip.png ;;
+				32x32*)   vinstall "$f" 644 usr/share/icons/hicolor/32x32/apps peazip.png ;;
+				48x48*)   vinstall "$f" 644 usr/share/icons/hicolor/48x48/apps peazip.png ;;
+				64x64*)   vinstall "$f" 644 usr/share/icons/hicolor/64x64/apps peazip.png ;;
+				128x128*) vinstall "$f" 644 usr/share/icons/hicolor/128x128/apps peazip.png ;;
+				256x256*) vinstall "$f" 644 usr/share/icons/hicolor/256x256/apps peazip.png ;;
+			esac
+		done
+	fi
+}

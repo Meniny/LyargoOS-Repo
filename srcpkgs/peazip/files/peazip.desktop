@@ -1,0 +1,19 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=PeaZip
+Comment=Archive manager and file compressor
+Exec=peazip %F
+TryExec=peazip
+Icon=peazip
+Categories=Utility;Archiving;Compression;
+MimeType=application/zip;application/x-7z-compressed;application/x-rar-compressed;application/gzip;application/x-tar;application/x-bzip2;application/x-xz;
+Actions=add;extract;extracthere;
+
+[Desktop Action add]
+Name=Add to archive
+Exec=peazip -add2archive %F
+
+[Desktop Action extract]
+Name=Extract here
+Exec=peazip -extracthere %F

@@ -1,0 +1,4 @@
+staging/private.pem
+staging/*.xbps
+staging/*.sig2
+staging/*-repodata

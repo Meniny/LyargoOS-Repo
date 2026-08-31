@@ -1,0 +1,28 @@
+# Template file for 'lyargoos-calamares-config'
+pkgname=lyargoos-calamares-config
+version=1.0
+revision=1
+build_style=meta
+short_desc="LyargoOS Calamares installer configuration"
+maintainer="LyargoOS Team <lyargoos@example.com>"
+license="MIT"
+homepage="https://github.com/Meniny/LyargoOS-Repo"
+depends="calamares"
+
+do_install() {
+	# Main settings
+	vmkdir etc/calamares
+	vinstall ${FILESDIR}/settings.conf 644 etc/calamares
+
+	# Branding
+	vmkdir etc/calamares/branding/lyargoos
+	vinstall ${FILESDIR}/branding.desc 644 etc/calamares/branding/lyargoos
+
+	# Module configs
+	vinstall ${FILESDIR}/services-runit.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/partition.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/users.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/welcome.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/pkgchooser.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/packages.conf 644 etc/calamares/modules
+}
