@@ -152,11 +152,15 @@ if [ -d "$LYARGOOS_DIR" ] && [ -f "$LYARGOOS_DIR/overlay/common/etc/xbps.d/finge
         info "Committing fingerprint to lyargoos repo..."
         cd "$LYARGOOS_DIR"
         git add overlay/common/etc/xbps.d/fingerprint overlay/common/etc/xbps.d/LyargoOS.pub
-        git commit -m "Update XBPS repo signing key"
-        printf "${CYAN}Push to remote? [y/N]:${NC} "
-        read -r PUSH_CHOICE
-        if [ "$PUSH_CHOICE" = "y" ] || [ "$PUSH_CHOICE" = "Y" ]; then
-            git push
+        if git diff --staged --quiet; then
+            info "No changes to commit (already up to date)"
+        else
+            git commit -m "Update XBPS repo signing key"
+            printf "${CYAN}Push to remote? [y/N]:${NC} "
+            read -r PUSH_CHOICE
+            if [ "$PUSH_CHOICE" = "y" ] || [ "$PUSH_CHOICE" = "Y" ]; then
+                git push
+            fi
         fi
         cd "$STAGING"
     fi
