@@ -1,4 +1,16 @@
 ---
+componentName: lyargoos
+
+welcomeStyleCalamares: false
+welcomeExpandingLogo: true
+
+windowExpanding: normal
+windowSize: 800px,520px
+windowPlacement: center
+
+sidebar: widget
+navigation: widget
+
 strings:
   productName:         "LyargoOS"
   shortProductName:    "LyargoOS"
@@ -6,20 +18,26 @@ strings:
   shortVersion:        "2024.1"
   versionedName:       "LyargoOS 2024.1"
   shortVersionedName:  "LyargoOS 2024.1"
+  bootloaderEntryName: "LyargoOS"
   productUrl:          "https://github.com/lyargoos"
   supportUrl:          "https://docs.voidlinux.org"
   knownIssuesUrl:      "https://github.com/lyargoos/issues"
   releaseNotesUrl:     "https://github.com/lyargoos/releases"
   donateUrl:           ""
-  productLogo:         "/usr/share/pixmaps/lyargoos-logo.svg"
-  productIcon:         "/usr/share/pixmaps/lyargoos-logo.svg"
-  productWallpaper:    "/usr/share/wallpapers/LyargoOS-Dark/contents/images/7680x2160.jpg"
 
 images:
-  productBanner:       "/usr/share/pixmaps/lyargoos-logo.svg"
-  productScreenshot:   "/usr/share/pixmaps/lyargoos-logo.svg"
   productLogo:         "/usr/share/pixmaps/lyargoos-logo.svg"
   productIcon:         "/usr/share/pixmaps/lyargoos-logo.svg"
   productWallpaper:    "/usr/share/wallpapers/LyargoOS-Dark/contents/images/7680x2160.jpg"
+  productBanner:       "/usr/share/pixmaps/lyargoos-logo.svg"
+  productScreenshot:   "/usr/share/pixmaps/lyargoos-logo.svg"
+  productWelcome:      "/usr/share/pixmaps/lyargoos-logo.svg"
 
-slideshow: "file:///usr/share/calamares/slideshow/show.html"
+style:
+  SidebarBackground:        "#2a2e32"
+  SidebarText:              "#fcfcfc"
+  SidebarTextCurrent:       "#ffffff"
+  SidebarBackgroundCurrent: "#3daee9"
+
+slideshow: "slideshow/show.qml"
+slideshowAPI: 2

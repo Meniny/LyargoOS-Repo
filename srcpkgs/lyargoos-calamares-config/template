@@ -17,11 +17,18 @@ do_install() {
 	vmkdir etc/calamares/branding/lyargoos
 	vinstall ${FILESDIR}/branding.desc 644 etc/calamares/branding/lyargoos
 
+	# Slideshow
+	vmkdir etc/calamares/branding/lyargoos/slideshow
+	vinstall ${FILESDIR}/slideshow/show.qml 644 etc/calamares/branding/lyargoos/slideshow
+
 	# Module configs
 	vinstall ${FILESDIR}/services-runit.conf 644 etc/calamares/modules
 	vinstall ${FILESDIR}/partition.conf 644 etc/calamares/modules
 	vinstall ${FILESDIR}/users.conf 644 etc/calamares/modules
 	vinstall ${FILESDIR}/welcome.conf 644 etc/calamares/modules
-	vinstall ${FILESDIR}/pkgchooser.conf 644 etc/calamares/modules
 	vinstall ${FILESDIR}/packages.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/removeuser.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/finished.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/shellprocess-setshell.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/unpackfs.conf 644 etc/calamares/modules
 }
