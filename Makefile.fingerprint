@@ -1,0 +1,16 @@
+CC ?= gcc
+CFLAGS ?= -Wall -Wextra -O2
+LDFLAGS ?= -lcrypto
+
+all: xbps-fingerprint
+
+xbps-fingerprint: xbps-fingerprint.c
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+clean:
+	rm -f xbps-fingerprint
+
+install: xbps-fingerprint
+	install -Dm755 xbps-fingerprint /usr/local/bin/xbps-fingerprint
+
+.PHONY: all clean install

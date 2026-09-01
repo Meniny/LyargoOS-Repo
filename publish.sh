@@ -20,6 +20,7 @@ NC='\033[0m' # No Color
 
 info() { echo "${BLUE}==>${NC} $1"; }
 success() { echo "${GREEN}==>${NC} $1"; }
+warn() { echo "${YELLOW}==>${NC} $1"; }
 error() { echo "${RED}Error:${NC} $1" >&2; }
 
 usage() {
@@ -105,6 +106,22 @@ fi
 info "Initializing signed repository..."
 xbps-rindex --privkey "$PRIVKEY" --sign --signedby "$SIGNEDBY" "$STAGING"
 
+# Calculate fingerprint using xbps-fingerprint tool (extracted from XBPS source)
+info "Calculating repository fingerprint..."
+if [ ! -x "$SCRIPT_DIR/xbps-fingerprint" ]; then
+    info "Building xbps-fingerprint tool..."
+    make -f "$SCRIPT_DIR/Makefile.fingerprint" -C "$SCRIPT_DIR" >/dev/null 2>&1 || {
+        error "Failed to build xbps-fingerprint tool"
+        exit 1
+    }
+fi
+# Extract public key from private key first
+openssl rsa -in "$PRIVKEY" -pubout -out "$STAGING/temp_pubkey.pem" 2>/dev/null
+FINGERPRINT=$("$SCRIPT_DIR/xbps-fingerprint" "$STAGING/temp_pubkey.pem")
+rm -f "$STAGING/temp_pubkey.pem"
+echo "$FINGERPRINT" > "$STAGING/fingerprint"
+info "Fingerprint: $FINGERPRINT"
+
 info "Signing all packages..."
 xbps-rindex --privkey "$PRIVKEY" --sign-pkg "$STAGING"/*.xbps
 
@@ -114,8 +131,32 @@ info "Updating public key in ISO overlay..."
 openssl rsa -in "$PRIVKEY" -pubout -out "$PUBKEY" 2>/dev/null
 if [ -d "$OVERLAY_XBPSD" ]; then
     cp "$PUBKEY" "$OVERLAY_XBPSD/"
+    # Also copy fingerprint if available
+    if [ -f "$STAGING/fingerprint" ]; then
+        cp "$STAGING/fingerprint" "$SCRIPT_DIR/../lyargoos/overlay/common/etc/xbps.d/"
+    fi
 else
     error "overlay directory not found: $OVERLAY_XBPSD"
+fi
+
+# Ask if user wants to commit fingerprint changes to lyargoos repo
+LYARGOOS_DIR="$SCRIPT_DIR/../lyargoos"
+if [ -d "$LYARGOOS_DIR" ] && [ -f "$LYARGOOS_DIR/overlay/common/etc/xbps.d/fingerprint" ]; then
+    echo ""
+    printf "${CYAN}Commit fingerprint to lyargoos repo? [y/N]:${NC} "
+    read -r COMMIT_CHOICE
+    if [ "$COMMIT_CHOICE" = "y" ] || [ "$COMMIT_CHOICE" = "Y" ]; then
+        info "Committing fingerprint to lyargoos repo..."
+        cd "$LYARGOOS_DIR"
+        git add overlay/common/etc/xbps.d/fingerprint overlay/common/etc/xbps.d/LyargoOS.pub
+        git commit -m "Update XBPS repo signing key"
+        printf "${CYAN}Push to remote? [y/N]:${NC} "
+        read -r PUSH_CHOICE
+        if [ "$PUSH_CHOICE" = "y" ] || [ "$PUSH_CHOICE" = "Y" ]; then
+            git push
+        fi
+        cd "$STAGING"
+    fi
 fi
 
 case "$MODE" in
