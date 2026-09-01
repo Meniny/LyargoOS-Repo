@@ -1,0 +1,18 @@
+# Template file for 'lyargoos-xbps'
+pkgname=lyargoos-xbps
+version=0.1.0
+revision=1
+build_style=copy
+short_desc="LyargoOS XBPS package manager wrappers — xpt (apt-style) and xman (pacman-style)"
+maintainer="LyargoOS <your@email.com>"
+license="MIT"
+homepage="https://github.com/Meniny/LyargoOS-XBPS"
+distfiles="https://github.com/Meniny/LyargoOS-XBPS/releases/download/v${version}/xbps-tools-v${version}-linux-x86_64.tar.gz"
+checksum="ee4496b04edc2f3b97ae762725cf2ee6aaa4bb82bcf75c33bdaab46ff2c08946"
+nostrip=yes
+archs="x86_64"
+
+do_install() {
+	vbin xpt
+	vbin xman
+}

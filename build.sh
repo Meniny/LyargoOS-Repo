@@ -76,6 +76,13 @@ done
 
 cd "$VOID_PKGS"
 
+# Bootstrap if needed
+if [ ! -d "hostdir/masterdir" ]; then
+    echo "==> Bootstrapping xbps-src..."
+    ./xbps-src binary-bootstrap
+    echo ""
+fi
+
 # Sync packages from lyargoos-repo
 echo "==> Syncing packages from lyargoos-repo..."
 for pkg in $PKGS; do
