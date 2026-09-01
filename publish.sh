@@ -95,11 +95,13 @@ fi
 cd "$STAGING"
 
 info "Indexing x86_64 packages..."
-xbps-rindex -a *.xbps
+rm -f x86_64-repodata
+xbps-rindex -a *.x86_64.xbps
 
 # Check for aarch64 packages
 if ls *.aarch64.xbps 1>/dev/null 2>&1; then
     info "Indexing aarch64 packages..."
+    rm -f aarch64-repodata
     XBPS_ARCH=aarch64 xbps-rindex -a *.aarch64.xbps
 fi
 
@@ -123,6 +125,7 @@ echo "$FINGERPRINT" > "$STAGING/fingerprint"
 info "Fingerprint: $FINGERPRINT"
 
 info "Signing all packages..."
+rm -f "$STAGING"/*.sig2
 xbps-rindex --privkey "$PRIVKEY" --sign-pkg "$STAGING"/*.xbps
 
 # Extract public key from private key and copy to ISO overlay
