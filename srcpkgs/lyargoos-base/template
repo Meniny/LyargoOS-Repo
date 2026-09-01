@@ -1,0 +1,11 @@
+# Template file for 'lyargoos-base'
+# Meta-package that pulls in essential LyargoOS tools
+pkgname=lyargoos-base
+version=0.1
+revision=1
+metapackage=yes
+depends="lyargoos-xbps lyargoos-artwork lyargoos-welcome"
+short_desc="LyargoOS base system meta-package"
+maintainer="LyargoOS <meniny@qq.com>"
+license="MIT"
+homepage="https://github.com/Meniny/LyargoOS"

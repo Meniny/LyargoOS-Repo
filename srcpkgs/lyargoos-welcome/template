@@ -1,0 +1,29 @@
+# Template file for 'lyargoos-welcome'
+pkgname=lyargoos-welcome
+version=0.1.0
+revision=1
+distfiles="https://github.com/Meniny/LyargoOS-Welcome/releases/download/v${version}/lyargoos-welcome-v${version}-linux-x86_64.tar.gz"
+checksum="8b245b8d12b11deea5663aa33cfd6bbee7c1049a909ef2341055b8dc99491694"
+depends="polkit gtk4"
+archs="x86_64"
+nostrip=yes
+short_desc="LyargoOS Welcome Screen"
+maintainer="LyargoOS <meniny@qq.com>"
+license="GPL-3.0-or-later"
+homepage="https://github.com/Meniny/LyargoOS-Welcome"
+
+do_install() {
+	# Install binary
+	vbin bin/lyargoos-welcome
+	
+	# Install scripts
+	vmkdir usr/libexec/lyargoos-welcome/scripts
+	for f in libexec/lyargoos-welcome/scripts/*.sh; do
+		[ -f "$f" ] || continue
+		vinstall "$f" 755 usr/libexec/lyargoos-welcome/scripts/
+	done
+	
+	# Install resources
+	vmkdir usr/share/lyargoos-welcome
+	vinstall share/lyargoos-welcome/resources.gresource 644 usr/share/lyargoos-welcome/
+}

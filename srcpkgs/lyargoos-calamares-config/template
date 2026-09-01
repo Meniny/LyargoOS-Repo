@@ -2,7 +2,6 @@
 pkgname=lyargoos-calamares-config
 version=1.0
 revision=1
-build_style=meta
 short_desc="LyargoOS Calamares installer configuration"
 maintainer="LyargoOS Team <lyargoos@example.com>"
 license="MIT"

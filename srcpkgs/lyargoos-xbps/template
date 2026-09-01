@@ -2,15 +2,22 @@
 pkgname=lyargoos-xbps
 version=0.1.0
 revision=1
-build_style=copy
 short_desc="LyargoOS XBPS package manager wrappers — xpt (apt-style) and xman (pacman-style)"
 maintainer="LyargoOS <your@email.com>"
 license="MIT"
 homepage="https://github.com/Meniny/LyargoOS-XBPS"
-distfiles="https://github.com/Meniny/LyargoOS-XBPS/releases/download/v${version}/xbps-tools-v${version}-linux-x86_64.tar.gz"
-checksum="ee4496b04edc2f3b97ae762725cf2ee6aaa4bb82bcf75c33bdaab46ff2c08946"
 nostrip=yes
-archs="x86_64"
+
+case "$XBPS_TARGET_MACHINE" in
+	x86_64)
+		distfiles="https://github.com/Meniny/LyargoOS-XBPS/releases/download/v${version}/xbps-tools-v${version}-linux-x86_64.tar.gz"
+		checksum="17ada85fe8642ff9e4084d032067146d0ba3f90c3a5d472385733be7f00510ea"
+		;;
+	aarch64)
+		distfiles="https://github.com/Meniny/LyargoOS-XBPS/releases/download/v${version}/xbps-tools-v${version}-linux-aarch64.tar.gz"
+		checksum="fa5e7863db683cfa136b0a7062b40a13b762d3f8723b341229720b0843e06e22"
+		;;
+esac
 
 do_install() {
 	vbin xpt
