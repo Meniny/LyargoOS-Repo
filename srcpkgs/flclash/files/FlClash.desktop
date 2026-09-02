@@ -9,4 +9,3 @@ Categories=Network;
 Keywords=Clash;ClashMeta;Proxy;
 StartupNotify=true
 Terminal=false
-MimeType=x-scheme-handler/http;x-scheme-handler/https;
