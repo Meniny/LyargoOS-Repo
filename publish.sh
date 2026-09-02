@@ -101,6 +101,18 @@ if [ ! -f "$PRIVKEY" ]; then
     exit 1
 fi
 
+if ! command -v gh >/dev/null 2>&1; then
+    error "gh (GitHub CLI) is not installed"
+    error "Install it with: xbps-install -S github-cli"
+    exit 1
+fi
+
+if ! gh auth status >/dev/null 2>&1; then
+    error "gh is not authenticated"
+    error "Run: gh auth login"
+    exit 1
+fi
+
 cd "$STAGING"
 
 # Copy newly built packages from void-packages hostdir
