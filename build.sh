@@ -18,14 +18,27 @@
 
 set -e
 
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+info() { printf "${BLUE}==> ${NC}%s\n" "$1"; }
+success() { printf "${GREEN}==> ${NC}%s\n" "$1"; }
+warn() { printf "${YELLOW}==> ${NC}%s\n" "$1"; }
+error() { printf "${RED}Error: ${NC}%s\n" "$1" >&2; }
+
 # Auto-detect paths based on script location
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 VOID_PKGS="${VOID_PKGS:-$SCRIPT_DIR/void-packages}"
 
 # Verify paths exist
 if [ ! -d "$VOID_PKGS" ]; then
-    echo "Error: void-packages not found at $VOID_PKGS"
-    echo "Initialize submodule: git submodule update --init --recursive"
+    error "void-packages not found at $VOID_PKGS"
+    info "Initialize submodule: git submodule update --init --recursive"
     exit 1
 fi
 
@@ -72,12 +85,12 @@ done
 
 # Defaults
 [ -z "$ARCHS" ] && ARCHS="x86_64"
-[ -z "$PKGS" ] && { echo "No packages specified. Use -p PKG or -P for all."; exit 1; }
+[ -z "$PKGS" ] && { error "No packages specified. Use -p PKG or -P for all."; exit 1; }
 
 # Ask about cleaning if not specified via flag
 if [ "$CLEAN" = 0 ]; then
-    echo "Packages to build: $PKGS"
-    printf "Clean build directories for these packages first? [y/N]: "
+    info "Packages to build: $PKGS"
+    printf "${CYAN}Clean build directories for these packages first? [y/N]: ${NC}"
     read -r CLEAN_CHOICE
     if [ "$CLEAN_CHOICE" = "y" ] || [ "$CLEAN_CHOICE" = "Y" ]; then
         CLEAN=1
@@ -89,25 +102,25 @@ cd "$VOID_PKGS"
 
 # Bootstrap if needed
 if [ ! -d "hostdir/masterdir" ]; then
-    echo "==> Bootstrapping xbps-src..."
+    info "Bootstrapping xbps-src..."
     ./xbps-src binary-bootstrap
     echo ""
 fi
 
 # Sync packages from lyargoos-repo
-echo "==> Syncing packages from lyargoos-repo..."
+info "Syncing packages from lyargoos-repo..."
 for pkg in $PKGS; do
     if [ -d "$SCRIPT_DIR/srcpkgs/$pkg" ]; then
         rm -rf "srcpkgs/$pkg"
         cp -r "$SCRIPT_DIR/srcpkgs/$pkg" "srcpkgs/$pkg"
     else
-        echo "Warning: Package $pkg not found in lyargoos-repo"
+        warn "Package $pkg not found in lyargoos-repo"
     fi
 done
 
 # Clean if requested
 if [ "$CLEAN" = 1 ]; then
-    echo "==> Cleaning build directories..."
+    info "Cleaning build directories..."
     for pkg in $PKGS; do
         ./xbps-src clean "$pkg" 2>/dev/null || true
     done
@@ -122,7 +135,7 @@ for arch in $ARCHS; do
 
     for pkg in $PKGS; do
         echo ""
-        echo "==> Building $pkg for $arch..."
+        info "Building $pkg for $arch..."
 
         if [ "$arch" = "x86_64" ]; then
             ./xbps-src pkg "$pkg"
@@ -131,14 +144,14 @@ for arch in $ARCHS; do
         fi
 
         if [ $? -eq 0 ]; then
-            echo "✓ $pkg ($arch) built successfully"
+            success "$pkg ($arch) built successfully"
         else
-            echo "✗ $pkg ($arch) failed"
+            error "$pkg ($arch) failed"
         fi
     done
 done
 
 echo ""
-echo "==> Build complete!"
-echo "Packages are in: $VOID_PKGS/hostdir/binpkgs/"
+success "Build complete!"
+info "Packages are in: $VOID_PKGS/hostdir/binpkgs/"
 ls -lh "$VOID_PKGS/hostdir/binpkgs/"*.xbps 2>/dev/null | grep -E "$(echo $PKGS | tr ' ' '|')" || echo "No packages found"

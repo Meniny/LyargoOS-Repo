@@ -1,0 +1,66 @@
+# Template file for 'wechat'
+pkgname=wechat
+version=4.1.1
+revision=1
+archs="x86_64 aarch64"
+create_wrksrc=yes
+hostmakedepends="squashfs-tools"
+short_desc="WeChat for Linux"
+maintainer="Meniny <meniny@qq.com>"
+license="Proprietary"
+homepage="https://linux.weixin.qq.com/"
+
+case "$XBPS_TARGET_MACHINE" in
+    x86_64)
+        distfiles="https://dldir1v6.qq.com/weixin/Universal/Linux/WeChatLinux_x86_64.AppImage"
+        checksum=457dba02b91b031cdd4412eee074fbbffb9d9d06b1e50fc1822d34870e114990
+        ;;
+    aarch64)
+        distfiles="https://dldir1v6.qq.com/weixin/Universal/Linux/WeChatLinux_arm64.AppImage"
+        checksum=44b1e169cdf0492d42f6bc771ac034ed3a75133c527f62cb04cc8fb6b1029d46
+        ;;
+esac
+
+nostrip=yes
+
+do_extract() {
+	# Create wrksrc to satisfy xbps-src
+	mkdir -p ${XBPS_BUILDDIR}/${pkgname}-${version}
+}
+
+do_install() {
+	# Create wrksrc to satisfy xbps-src check
+	mkdir -p ${XBPS_BUILDDIR}/${pkgname}-${version}
+	
+	vmkdir opt/wechat
+	vmkdir usr/bin
+	
+	# Extract to temp location
+	EXTRACT_DIR=$(mktemp -d)
+	cd "$EXTRACT_DIR"
+	APPIMAGE="${XBPS_SRCDISTDIR}/${pkgname}-${version}/$(basename $distfiles)"
+	chmod +x "$APPIMAGE"
+	"$APPIMAGE" --appimage-extract
+	cd squashfs-root
+	
+	# Copy the extracted AppImage contents
+	cp -a * ${DESTDIR}/opt/wechat/
+	
+	# Install wrapper script
+	cat > ${DESTDIR}/usr/bin/wechat << 'WRAPPER'
+#!/bin/sh
+cd /opt/wechat
+exec ./wechat "$@"
+WRAPPER
+	chmod 755 ${DESTDIR}/usr/bin/wechat
+	
+	# Install desktop file
+	vinstall ${FILESDIR}/wechat.desktop 644 usr/share/applications
+	
+	# Install icon
+	vinstall ${FILESDIR}/wechat.svg 644 usr/share/icons/hicolor/scalable/apps
+	
+	# Cleanup
+	cd /
+	rm -rf "$EXTRACT_DIR"
+}

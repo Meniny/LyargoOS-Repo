@@ -1,7 +1,7 @@
 # Template file for 'lyargoos-calamares-config'
 pkgname=lyargoos-calamares-config
-version=1.0
-revision=2
+version=0.1.0
+revision=1
 short_desc="LyargoOS Calamares installer configuration"
 maintainer="Meniny <meniny@qq.com>"
 license="MIT"

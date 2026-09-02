@@ -1,6 +1,6 @@
 # Template file for 'lyargoos-base-files'
 pkgname=lyargoos-base-files
-version=0.1
+version=0.1.0
 revision=1
 bootstrap=yes
 depends="xbps-triggers"

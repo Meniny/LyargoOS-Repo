@@ -1,7 +1,7 @@
 # Template file for 'lyargoos-base'
 # Meta-package that pulls in essential LyargoOS tools
 pkgname=lyargoos-base
-version=0.1
+version=0.1.0
 revision=1
 metapackage=yes
 depends="lyargoos-xbps lyargoos-artwork lyargoos-welcome"

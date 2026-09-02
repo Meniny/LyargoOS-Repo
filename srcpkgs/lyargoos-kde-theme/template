@@ -1,6 +1,6 @@
 # Template file for 'lyargoos-kde-theme'
 pkgname=lyargoos-kde-theme
-version=0.1
+version=0.1.0
 revision=1
 build_style=gnu-makefile
 depends="breeze-icons"
@@ -10,7 +10,7 @@ license="CC-BY-4.0"
 homepage="https://github.com/Meniny/LyargoOS-Artworks"
 # Same source as lyargoos-artwork — the KDE theme files live under kde/
 distfiles="https://github.com/Meniny/LyargoOS-Artworks/archive/refs/tags/v${version}.tar.gz"
-checksum=753e143da13d0f93b23b6e011d4c853a4f42975a28ce7e712f02c7f96d279c51
+checksum=90d975714b758300b68e260db8775bfc70ce7290e91bc4b33a90b36d3cf73991
 wrksrc="LyargoOS-Artworks-${version}"
 nostrip=yes
 

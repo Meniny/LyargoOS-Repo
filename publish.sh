@@ -18,10 +18,10 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-info() { echo "${BLUE}==>${NC} $1"; }
-success() { echo "${GREEN}==>${NC} $1"; }
-warn() { echo "${YELLOW}==>${NC} $1"; }
-error() { echo "${RED}Error:${NC} $1" >&2; }
+info() { echo -e "${BLUE}==>${NC} $1"; }
+success() { echo -e "${GREEN}==>${NC} $1"; }
+warn() { echo -e "${YELLOW}==>${NC} $1"; }
+error() { echo -e "${RED}Error:${NC} $1" >&2; }
 
 usage() {
     echo "Usage: $0 [-n|-r|-R] [tag] [title] [notes]"
@@ -54,8 +54,7 @@ shift $((OPTIND - 1))
 
 # Interactive mode if arguments are missing
 if [ -z "$1" ]; then
-    echo "${CYAN}Mode:${NC} [n]ew, [r]elease only, [R]ecreate all (default: n)"
-    printf "> "
+    printf "${CYAN}Mode:${NC} [n]ew, [r]elease only, [R]ecreate all (default: n)\n> "
     read -r MODE_CHOICE
     case "$MODE_CHOICE" in
         r|R) MODE="release"; [ "$MODE_CHOICE" = "R" ] && MODE="both" ;;
@@ -80,10 +79,10 @@ else
 fi
 
 echo ""
-echo "${CYAN}Mode:${NC} $MODE"
-echo "${CYAN}Tag:${NC} $TAG"
-echo "${CYAN}Title:${NC} $TITLE"
-echo "${CYAN}Notes:${NC} $NOTES"
+info "Mode: $MODE"
+info "Tag: $TAG"
+info "Title: $TITLE"
+info "Notes: $NOTES"
 echo ""
 
 warn "Make sure you have built the packages first with ./build.sh"

@@ -1,6 +1,6 @@
 # Template file for 'lyargoos-artwork'
 pkgname=lyargoos-artwork
-version=0.1
+version=0.1.0
 revision=1
 build_style=gnu-makefile
 short_desc="LyargoOS artwork — wallpapers, logos, splash screen"
@@ -8,7 +8,7 @@ maintainer="Meniny <meniny@qq.com>"
 license="CC-BY-4.0"
 homepage="https://github.com/Meniny/LyargoOS-Artworks"
 distfiles="https://github.com/Meniny/LyargoOS-Artworks/archive/refs/tags/v${version}.tar.gz"
-checksum=753e143da13d0f93b23b6e011d4c853a4f42975a28ce7e712f02c7f96d279c51
+checksum=90d975714b758300b68e260db8775bfc70ce7290e91bc4b33a90b36d3cf73991
 wrksrc="LyargoOS-Artworks-${version}"
 nostrip=yes
 

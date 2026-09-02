@@ -1,0 +1,75 @@
+# Template file for 'qq'
+pkgname=qq
+version=3.2.32
+revision=1
+archs="x86_64 aarch64"
+depends="libayatana-appindicator"
+create_wrksrc=yes
+hostmakedepends="squashfs-tools"
+short_desc="Tencent QQ for Linux"
+maintainer="Meniny <meniny@qq.com>"
+license="Proprietary"
+homepage="https://im.qq.com/linuxqq/index.shtml"
+
+case "$XBPS_TARGET_MACHINE" in
+    x86_64)
+        distfiles="https://github.com/Meniny/LyargoOS-Distfiles/releases/download/qq-${version}_260812/QQ_${version}_260812_x86_64_01.AppImage"
+        checksum=311043510d64fc006ed252ce8ae7f133660f1f678eff01cf255e2907c1f42d7f
+        ;;
+    aarch64)
+        distfiles="https://github.com/Meniny/LyargoOS-Distfiles/releases/download/qq-${version}_260812/QQ_${version}_260812_arm64_01.AppImage"
+        checksum=2b00d8c543b71ecd349942d840207ef9de34a16d783298a20577e369e1d1e8ed
+        ;;
+esac
+
+nomirror=yes
+nostrip=yes
+shlib_provides="libdbusmenu-gtk.so.4"
+
+do_extract() {
+	# Create wrksrc to satisfy xbps-src
+	mkdir -p ${XBPS_BUILDDIR}/${pkgname}-${version}
+}
+
+do_install() {
+	# Create wrksrc to satisfy xbps-src check
+	mkdir -p ${XBPS_BUILDDIR}/${pkgname}-${version}
+	
+	vmkdir opt/qq
+	vmkdir usr/bin
+	
+	# Extract to temp location
+	EXTRACT_DIR=$(mktemp -d)
+	cd "$EXTRACT_DIR"
+	APPIMAGE="${XBPS_SRCDISTDIR}/${pkgname}-${version}/$(basename $distfiles)"
+	chmod +x "$APPIMAGE"
+	"$APPIMAGE" --appimage-extract
+	cd squashfs-root
+	
+	# Copy the extracted AppImage contents
+	cp -a * ${DESTDIR}/opt/qq/
+	
+	# Install wrapper script
+	cat > ${DESTDIR}/usr/bin/qq << 'WRAPPER'
+#!/bin/sh
+cd /opt/qq
+exec ./qq "$@"
+WRAPPER
+	chmod 755 ${DESTDIR}/usr/bin/qq
+	
+	# Install bundled library to standard location for xbps to find
+	if [ -f usr/lib/libdbusmenu-gtk.so.4 ]; then
+		vmkdir usr/lib
+		cp -a usr/lib/libdbusmenu-gtk.so.4* ${DESTDIR}/usr/lib/
+	fi
+	
+	# Install desktop file
+	vinstall ${FILESDIR}/qq.desktop 644 usr/share/applications
+	
+	# Install icon
+	vinstall ${FILESDIR}/qq.svg 644 usr/share/icons/hicolor/scalable/apps
+	
+	# Cleanup
+	cd /
+	rm -rf "$EXTRACT_DIR"
+}
