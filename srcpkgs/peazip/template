@@ -3,6 +3,7 @@ pkgname=peazip
 version=11.2.0
 revision=1
 archs="x86_64 aarch64"
+depends="gmp ncurses-libs"
 short_desc="Free file archiver and compressor with broad format support"
 maintainer="Meniny <meniny@qq.com>"
 license="LGPL-3.0-only"
