@@ -39,4 +39,10 @@ do_install() {
 		vmkdir usr/share/plasma/desktoptheme/lyargoos
 		cp -r kde/desktop-theme/* ${DESTDIR}/usr/share/plasma/desktoptheme/lyargoos/
 	fi
+
+	# SDDM configuration
+	vinstall ${FILESDIR}/sddm.conf 644 etc/sddm.conf.d
+	
+	# KDE system-wide defaults
+	vinstall ${FILESDIR}/kdeglobals 644 etc/xdg
 }

@@ -1,0 +1,5 @@
+[Wallpaper]
+Image=/usr/share/wallpapers/lyargoos-wallpaper.jpg
+
+[KSplash]
+Theme=org.kde.breeze.desktop
