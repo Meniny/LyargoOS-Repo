@@ -29,7 +29,7 @@ images:
   productLogo:         "/usr/share/pixmaps/lyargoos-logo.svg"
   productIcon:         "/usr/share/pixmaps/lyargoos-logo.svg"
   productWallpaper:    "/usr/share/wallpapers/LyargoOS-Dark/contents/images/7680x2160.jpg"
-  productBanner:       "/usr/share/pixmaps/lyargoos-logo.svg"
+  productBanner:       "/etc/calamares/branding/lyargoos/banner.jpg"
   productScreenshot:   "/usr/share/pixmaps/lyargoos-logo.svg"
   productWelcome:      "/usr/share/pixmaps/lyargoos-logo.svg"
 

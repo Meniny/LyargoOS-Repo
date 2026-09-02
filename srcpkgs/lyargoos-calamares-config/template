@@ -17,6 +17,7 @@ do_install() {
 	vmkdir etc/calamares/branding/lyargoos
 	vinstall ${FILESDIR}/branding.desc 644 etc/calamares/branding/lyargoos
 	vinstall ${FILESDIR}/stylesheet.qss 644 etc/calamares/branding/lyargoos
+	vinstall ${FILESDIR}/banner.jpg 644 etc/calamares/branding/lyargoos
 
 	# Slideshow
 	vmkdir etc/calamares/branding/lyargoos/slideshow
