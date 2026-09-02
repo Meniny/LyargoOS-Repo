@@ -14,7 +14,7 @@
 #   ./build.sh -p brave -p flclash -a x86_64          # Build brave and flclash for x86_64 only
 #   ./build.sh -P -A                                   # Build all packages for all architectures
 #   ./build.sh -p brave                                # Build brave for default arch (x86_64)
-#   ./build.sh -p peazip -a x86_64 -a aarch64         # Build peazip for both architectures
+#   ./build.sh -p peazip-qt6 -a x86_64                    # Build peazip-qt6 for x86_64
 
 set -e
 

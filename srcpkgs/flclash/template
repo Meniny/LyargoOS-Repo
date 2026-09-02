@@ -2,17 +2,22 @@
 pkgname=flclash
 version=0.8.96
 revision=1
-archs="x86_64"
-depends="libkeybinder3 libayatana-appindicator"
+archs="x86_64 aarch64"
+depends="libkeybinder3 libayatana-appindicator libsecret"
 short_desc="Multi-platform proxy client based on ClashMeta"
 maintainer="Meniny <meniny@qq.com>"
 license="GPL-3.0-only"
 homepage="https://github.com/chen08209/FlClash"
-distfiles="https://github.com/chen08209/FlClash/releases/download/v${version}/FlClash-${version}-linux-amd64.AppImage"
-checksum=7a874aac6ce7608d268d25a94690b995c6c06ddd1c66851678c821c8052d3cee
+case "$XBPS_TARGET_MACHINE" in
+	x86_64)  distfiles="https://github.com/chen08209/FlClash/releases/download/v${version}/FlClash-${version}-linux-amd64.AppImage"
+		 checksum=7a874aac6ce7608d268d25a94690b995c6c06ddd1c66851678c821c8052d3cee ;;
+	aarch64) distfiles="https://github.com/chen08209/FlClash/releases/download/v${version}/FlClash-${version}-linux-arm64.deb"
+		 checksum=9156147ed59e6f71edfbe7a4e27e8187bfc79d43133d4aeb2f6e5fa5f76adca2 ;;
+esac
 nostrip=yes
 skipwithuptodate=yes
 create_wrksrc=yes
+hostmakedepends="binutils zstd tar"
 
 do_extract() {
 	# Create wrksrc to satisfy xbps-src
@@ -20,26 +25,59 @@ do_extract() {
 }
 
 do_install() {
-	# Create wrksrc to satisfy xbps-src check (we don't actually use it)
-	mkdir -p ${XBPS_BUILDDIR}/${pkgname}-${version}
-	
 	vmkdir opt/flclash
 	vmkdir usr/bin
-	
-	# Extract to temp location
-	EXTRACT_DIR=$(mktemp -d)
-	cd "$EXTRACT_DIR"
-	APPIMAGE="${XBPS_SRCDISTDIR}/${pkgname}-${version}/FlClash-${version}-linux-amd64.AppImage"
-	chmod +x "$APPIMAGE"
-	"$APPIMAGE" --appimage-extract
-	cd squashfs-root
 
-	# Copy the extracted AppImage contents
-	for item in AppRun FlClash FlClashCore data lib usr; do
-		if [ -e "$item" ]; then
-			cp -a "$item" ${DESTDIR}/opt/flclash/
-		fi
-	done
+	case "$XBPS_TARGET_MACHINE" in
+		x86_64)
+			# Extract AppImage
+			EXTRACT_DIR=$(mktemp -d)
+			cd "$EXTRACT_DIR"
+			APPIMAGE="${XBPS_SRCDISTDIR}/${pkgname}-${version}/FlClash-${version}-linux-amd64.AppImage"
+			chmod +x "$APPIMAGE"
+			"$APPIMAGE" --appimage-extract
+			cd squashfs-root
+
+			# Copy the extracted AppImage contents
+			for item in AppRun FlClash FlClashCore data lib usr; do
+				if [ -e "$item" ]; then
+					cp -a "$item" ${DESTDIR}/opt/flclash/
+				fi
+			done
+
+			# Install icons from extracted contents
+			for size in 128 256; do
+				if [ -f "usr/share/icons/hicolor/${size}x${size}/apps/FlClash.png" ]; then
+					vinstall "usr/share/icons/hicolor/${size}x${size}/apps/FlClash.png" 644 \
+						usr/share/icons/hicolor/${size}x${size}/apps flclash.png
+				fi
+			done
+
+			# Cleanup
+			cd /
+			rm -rf "$EXTRACT_DIR"
+			;;
+		aarch64)
+			# Extract deb package
+			EXTRACT_DIR=$(mktemp -d)
+			cd "$EXTRACT_DIR"
+			DEB="${XBPS_SRCDISTDIR}/${pkgname}-${version}/FlClash-${version}-linux-arm64.deb"
+			ar x "$DEB"
+			zstd -d data.tar.zst --stdout | tar xf -
+
+			# Copy usr/share/FlClash contents to opt/flclash
+			cp -a usr/share/FlClash/* ${DESTDIR}/opt/flclash/
+
+			# Install icons from deb
+			if [ -d "usr/share/icons" ]; then
+				cp -a usr/share/icons/* ${DESTDIR}/usr/share/icons/ 2>/dev/null || true
+			fi
+
+			# Cleanup
+			cd /
+			rm -rf "$EXTRACT_DIR"
+			;;
+	esac
 
 	# Install wrapper script
 	cat > ${DESTDIR}/usr/bin/flclash << 'WRAPPER'
@@ -52,18 +90,6 @@ WRAPPER
 	# Install desktop file
 	vinstall ${FILESDIR}/FlClash.desktop 644 usr/share/applications
 
-	# Install icons from extracted contents
-	for size in 128 256; do
-		if [ -f "usr/share/icons/hicolor/${size}x${size}/apps/FlClash.png" ]; then
-			vinstall "usr/share/icons/hicolor/${size}x${size}/apps/FlClash.png" 644 \
-				usr/share/icons/hicolor/${size}x${size}/apps flclash.png
-		fi
-	done
-
 	# Install custom SVG icon
 	vinstall ${FILESDIR}/FlClash.svg 644 usr/share/icons/hicolor/scalable/apps flclash.svg
-	
-	# Cleanup
-	cd /
-	rm -rf "$EXTRACT_DIR"
 }

@@ -10,7 +10,7 @@ Custom XBPS package repository for [LyargoOS](https://github.com/Meniny/LyargoOS
 | `calamares` | GUI installer (with runit patches for Void) | Upstream Codeberg + Void patches |
 | `flclash` | Multi-platform proxy client | Upstream AppImage |
 | `onlyoffice` | Office suite | Upstream GitHub releases |
-| `peazip` | File archiver and compressor | Upstream tarball |
+| `peazip-qt6` | File archiver and compressor (Qt6) | Upstream tarball |
 | `ungoogled-chromium` | Chromium without Google services | Upstream GitHub releases |
 | `vscodium` | Free/Libre VS Code binaries | Upstream GitHub releases |
 | `wps-office` | WPS Office suite | Upstream RPM |
@@ -51,7 +51,7 @@ cp -r /path/to/lyargoos-repo/srcpkgs/* srcpkgs/
 ./xbps-src pkg brave
 ./xbps-src pkg calamares
 ./xbps-src pkg flclash
-./xbps-src pkg peazip
+./xbps-src pkg peazip-qt6
 ./xbps-src pkg lyargoos-artwork
 ./xbps-src pkg lyargoos-calamares-config
 ./xbps-src pkg lyargoos-kde-theme
@@ -260,7 +260,7 @@ lyargoos-repo/
 │   │   └── files/
 │   ├── onlyoffice/
 │   │   └── template
-│   ├── peazip/
+│   ├── peazip-qt6/
 │   │   ├── template
 │   │   └── files/
 │   ├── ungoogled-chromium/
@@ -286,7 +286,7 @@ lyargoos-repo/
 
 ## Notes
 
-- Pre-built binary packages (brave, flclash, peazip) use `archs="x86_64"` and `nostrip=yes`
+- Pre-built binary packages (brave, flclash, peazip-qt6) use `archs="x86_64"` and `nostrip=yes`
 - The `distfiles` URLs point to upstream releases — you need to fill in the `checksum` field after first download
 - Custom icons (SVG) can be placed in each package's `files/` directory
 - The `lyargoos-artwork` and `lyargoos-kde-theme` packages both fetch from the same `lyargoos-artwork` repo but install different files

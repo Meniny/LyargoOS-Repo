@@ -1,5 +1,5 @@
-# Template file for 'peazip'
-pkgname=peazip
+# Template file for 'peazip-qt6'
+pkgname=peazip-qt6
 version=11.2.0
 revision=1
 archs="x86_64"
@@ -22,7 +22,8 @@ do_install() {
 	vmkdir usr/bin
 	cat > ${DESTDIR}/usr/bin/peazip << 'WRAPPER'
 #!/bin/sh
-exec /opt/peazip/peazip "$@"
+cd /opt/peazip
+LD_LIBRARY_PATH=. exec ./peazip "$@"
 WRAPPER
 	chmod 755 ${DESTDIR}/usr/bin/peazip
 
