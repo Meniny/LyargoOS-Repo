@@ -177,6 +177,29 @@ REPOS=(
 
 Then add packages to `BASE_PACKAGES` (for all flavors) or flavor-specific variables like `KDE_PKGS`, `XFCE_PKGS`, `GNOME_PKGS`.
 
+## Adding the Repo to Void Linux
+
+You can add this repository to any Void Linux installation:
+
+1. Download the public key:
+```bash
+sudo mkdir -p /etc/xbps.d
+sudo wget -O /etc/xbps.d/LyargoOS.pub https://github.com/Meniny/LyargoOS-Repo/releases/latest/download/LyargoOS.pub
+```
+
+2. Add the repository:
+```bash
+cat << 'EOF' | sudo tee /etc/xbps.d/lyargoos.conf
+repository=https://github.com/Meniny/LyargoOS-Repo/releases/latest/download
+EOF
+```
+
+3. Sync and install packages:
+```bash
+sudo xbps-install -S
+sudo xbps-install qq wechat flclash
+```
+
 ## Mirror Configuration
 
 The default Void mirror (`repo-default.voidlinux.org`) may be slow depending on your location. Use `chmirror.sh` to switch to a faster mirror for package builds.
