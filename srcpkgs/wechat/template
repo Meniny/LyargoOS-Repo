@@ -4,7 +4,7 @@ version=4.1.1
 revision=1
 archs="x86_64 aarch64"
 create_wrksrc=yes
-hostmakedepends="squashfs-tools"
+hostmakedepends="squashfs-tools binutils"
 short_desc="WeChat for Linux"
 maintainer="Meniny <meniny@qq.com>"
 license="Proprietary"
@@ -39,8 +39,14 @@ do_install() {
 	EXTRACT_DIR=$(mktemp -d)
 	cd "$EXTRACT_DIR"
 	APPIMAGE="${XBPS_SRCDISTDIR}/${pkgname}-${version}/$(basename $distfiles)"
-	chmod +x "$APPIMAGE"
-	"$APPIMAGE" --appimage-extract
+	
+	# Extract AppImage without executing it (required for cross-compilation)
+	# Find squashfs offset - use the last occurrence of hsqs magic
+	OFFSET=$(grep -abo 'hsqs' "$APPIMAGE" | tail -1 | cut -d: -f1)
+	if [ -z "$OFFSET" ]; then
+		msg_error "Cannot find squashfs offset in AppImage\n"
+	fi
+	unsquashfs -d squashfs-root -o "$OFFSET" "$APPIMAGE"
 	cd squashfs-root
 	
 	# Copy the extracted AppImage contents
