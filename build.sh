@@ -74,6 +74,17 @@ done
 [ -z "$ARCHS" ] && ARCHS="x86_64"
 [ -z "$PKGS" ] && { echo "No packages specified. Use -p PKG or -P for all."; exit 1; }
 
+# Ask about cleaning if not specified via flag
+if [ "$CLEAN" = 0 ]; then
+    echo "Packages to build: $PKGS"
+    printf "Clean build directories for these packages first? [y/N]: "
+    read -r CLEAN_CHOICE
+    if [ "$CLEAN_CHOICE" = "y" ] || [ "$CLEAN_CHOICE" = "Y" ]; then
+        CLEAN=1
+    fi
+    echo ""
+fi
+
 cd "$VOID_PKGS"
 
 # Bootstrap if needed
