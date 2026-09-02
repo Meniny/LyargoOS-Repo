@@ -3,7 +3,6 @@ pkgname=peazip
 version=11.2.0
 revision=1
 archs="x86_64 aarch64"
-build_style=fetch
 short_desc="Free file archiver and compressor with broad format support"
 maintainer="Meniny <meniny@qq.com>"
 license="LGPL-3.0-only"
@@ -18,11 +17,10 @@ nostrip=yes
 
 do_install() {
 	vmkdir opt/peazip
-	vmkdir usr/bin
-	cd ${wrksrc}
 	vcopy "*" opt/peazip
 
 	# Install wrapper to make it available in PATH
+	vmkdir usr/bin
 	cat > ${DESTDIR}/usr/bin/peazip << 'WRAPPER'
 #!/bin/sh
 exec /opt/peazip/peazip "$@"
