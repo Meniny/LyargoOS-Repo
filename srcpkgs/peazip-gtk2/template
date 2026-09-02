@@ -1,21 +1,25 @@
-# Template file for 'peazip'
-pkgname=peazip
+# Template file for 'peazip-gtk2'
+pkgname=peazip-gtk2
 version=11.2.0
 revision=1
-archs="x86_64"
-short_desc="Free file archiver and compressor with broad format support (Qt6)"
+archs="x86_64 aarch64"
+depends="gtk+"
+short_desc="Free file archiver and compressor with broad format support (GTK2)"
 maintainer="Meniny <meniny@qq.com>"
 license="LGPL-3.0-only"
 homepage="https://peazip.github.io/"
-distfiles="https://github.com/peazip/PeaZip/releases/download/${version}/peazip_portable-${version}.LINUX.Qt6.${XBPS_TARGET_MACHINE}.tar.gz"
-checksum=e81f46854e0cf192f9eea3c51b41937ae308981f3849b8242503a77dd04bbdac
+distfiles="https://github.com/peazip/PeaZip/releases/download/${version}/peazip_portable-${version}.LINUX.GTK2.${XBPS_TARGET_MACHINE}.tar.gz"
+case "$XBPS_TARGET_MACHINE" in
+	x86_64)  checksum=aff93d7d378f7b673e2175d5c933476d28f114ae1cca7040c5f114ebe5bf36ca ;;
+	aarch64) checksum=5df50aa3c1b15684d11845baf133ea30f0e084e5abc5bad5d252e04b80629feb ;;
+esac
 nostrip=yes
 
 do_install() {
 	vmkdir opt/peazip
 	vcopy "*" opt/peazip
 
-	# Remove bundled 32-bit arc backend (requires libgmp.so.3/libncurses.so.5, unresolvable on 64-bit systems)
+	# Remove bundled 32-bit arc backend on x86_64 (requires libgmp.so.3/libncurses.so.5, unresolvable on 64-bit systems)
 	rm -f ${DESTDIR}/opt/peazip/res/bin/arc/arc
 
 	# Install wrapper to make it available in PATH

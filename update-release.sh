@@ -161,7 +161,7 @@ for pkg in $PKGS; do
     info "Processing package: $(hl_pkg $pkg)"
     
     # Find all matching packages in void-packages/hostdir/binpkgs (all architectures)
-    pkg_files=$(ls "$VOID_BINPKGS"/${pkg}-*.xbps 2>/dev/null || true)
+    pkg_files=$(ls "$VOID_BINPKGS"/${pkg}-[0-9]*.xbps 2>/dev/null || true)
     
     if [ -z "$pkg_files" ]; then
         warn "No built package found for $(hl_pkg $pkg) in $VOID_BINPKGS"
@@ -179,7 +179,7 @@ for pkg in $PKGS; do
         info "Found: $(hl_file $pkg_basename) [$(hl_arch $pkg_arch)]"
         
         # Remove old versions from staging (matching this package pattern AND arch)
-        for old_pkg in ${pkg_pattern}-*.xbps; do
+        for old_pkg in ${pkg_pattern}-[0-9]*.xbps; do
             if [ -f "$old_pkg" ]; then
                 old_arch=$(echo "$old_pkg" | sed 's/\.xbps.*$//' | awk -F'.' '{print $NF}')
                 if [ "$old_arch" = "$pkg_arch" ]; then
@@ -194,7 +194,7 @@ for pkg in $PKGS; do
         echo -e "  ${GREEN}✓${NC} Copied: $pkg_basename"
         
         # Delete old assets from GitHub release (matching this package pattern AND arch)
-        NO_COLOR=1 gh release view "$TAG" --repo "$REPO" --json assets -q '.assets[].name' 2>/dev/null | grep "^${pkg_pattern}-" | while read asset; do
+        NO_COLOR=1 gh release view "$TAG" --repo "$REPO" --json assets -q '.assets[].name' 2>/dev/null | grep "^${pkg_pattern}-[0-9]" | while read asset; do
             asset_arch=$(echo "$asset" | sed 's/\.xbps.*$//' | awk -F'.' '{print $NF}')
             if [ "$asset_arch" = "$pkg_arch" ]; then
                 echo -e "  ${RED}🗑${NC} Deleting from release: $asset"
@@ -219,7 +219,7 @@ for file in $FILES; do
     file_arch=$(echo "$file_basename" | sed 's/\.xbps.*$//' | awk -F'.' '{print $NF}')
     
     # Remove old versions from staging (same package pattern, same arch only)
-    for old_pkg in ${pkg_pattern}-*.xbps; do
+    for old_pkg in ${pkg_pattern}-[0-9]*.xbps; do
         if [ -f "$old_pkg" ] && [ "$old_pkg" != "$file_basename" ]; then
             old_arch=$(echo "$old_pkg" | sed 's/\.xbps.*$//' | awk -F'.' '{print $NF}')
             if [ "$old_arch" = "$file_arch" ]; then
@@ -238,7 +238,7 @@ for file in $FILES; do
     fi
     
     # Delete old assets from GitHub release (same arch only)
-    NO_COLOR=1 gh release view "$TAG" --repo "$REPO" --json assets -q '.assets[].name' 2>/dev/null | grep "^${pkg_pattern}-" | while read asset; do
+    NO_COLOR=1 gh release view "$TAG" --repo "$REPO" --json assets -q '.assets[].name' 2>/dev/null | grep "^${pkg_pattern}-[0-9]" | while read asset; do
         if [ "$asset" != "$file_basename" ]; then
             asset_arch=$(echo "$asset" | sed 's/\.xbps.*$//' | awk -F'.' '{print $NF}')
             if [ "$asset_arch" = "$file_arch" ]; then
