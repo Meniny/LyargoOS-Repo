@@ -1,0 +1,33 @@
+# Template file for 'ungoogled-chromium'
+pkgname=ungoogled-chromium
+version=151.0.7922.173.1
+revision=1
+_version="${version%.*}-${version##*.}"
+short_desc="Lightweight approach to removing Google web service dependency"
+maintainer="Meniny <meniny@qq.com>"
+license="BSD-3-Clause"
+_slug="ungoogled-software/ungoogled-chromium"
+homepage="https://github.com/ungoogled-software/ungoogled-chromium"
+distfiles="https://github.com/${_slug}-portablelinux/releases/download/${_version}/${pkgname}-${_version}-x86_64_linux.tar.xz
+ https://raw.githubusercontent.com/${_slug}/refs/tags/${_version}/LICENSE"
+checksum="e8149d382cf378456536371a4998cb8e6a0c3a2fcd12c05ed022e42d9e9f8f34
+ 78bc4abfc3e5606b5b88c3cb9409a3250a7f64cffe704bef0563e11910a29189"
+skip_extraction="LICENSE"
+nostrip=yes
+
+do_install() {
+	vmkdir opt/${pkgname}
+	vcopy "*" opt/${pkgname}
+
+	vmkdir usr/bin
+	ln -sf /opt/${pkgname}/chrome-wrapper ${DESTDIR}/usr/bin/${pkgname}
+
+	vinstall product_logo_48.png 644 \
+		usr/share/icons/hicolor/48x48/apps ${pkgname}.png
+
+	vinstall ${FILESDIR}/${pkgname}.desktop 644 usr/share/applications
+
+	vlicense ${XBPS_SRCDISTDIR}/${pkgname}-${version}/LICENSE
+
+	rm -f ${DESTDIR}/opt/${pkgname}/product_logo_48.png
+}

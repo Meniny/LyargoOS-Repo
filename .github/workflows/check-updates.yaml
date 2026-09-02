@@ -1,0 +1,196 @@
+name: Check Package Updates
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check vscodium
+        id: vscodium
+        run: |
+          CURRENT=$(grep '^version=' srcpkgs/vscodium/template | cut -d= -f2)
+          LATEST=$(curl -s https://api.github.com/repos/VSCodium/vscodium/releases/latest | jq -r .tag_name)
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          if [ "$CURRENT" != "$LATEST" ]; then
+            echo "update_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "update_available=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check onlyoffice
+        id: onlyoffice
+        run: |
+          CURRENT=$(grep '^version=' srcpkgs/onlyoffice/template | cut -d= -f2)
+          LATEST=$(curl -s https://api.github.com/repos/ONLYOFFICE/DesktopEditors/releases/latest | jq -r .tag_name | sed 's/^v//')
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          if [ "$CURRENT" != "$LATEST" ]; then
+            echo "update_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "update_available=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check ungoogled-chromium
+        id: ungoogled-chromium
+        run: |
+          CURRENT=$(grep '^version=' srcpkgs/ungoogled-chromium/template | cut -d= -f2)
+          LATEST_RAW=$(curl -s https://api.github.com/repos/ungoogled-software/ungoogled-chromium-portablelinux/releases/latest | jq -r .tag_name)
+          # Convert tag format: 151.0.7922.173-1 -> 151.0.7922.173.1
+          LATEST=$(echo "$LATEST_RAW" | sed 's/-/./')
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          if [ "$CURRENT" != "$LATEST" ]; then
+            echo "update_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "update_available=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check zen
+        id: zen
+        run: |
+          CURRENT=$(grep '^version=' srcpkgs/zen/template | cut -d= -f2)
+          LATEST=$(curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | jq -r .tag_name)
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          if [ "$CURRENT" != "$LATEST" ]; then
+            echo "update_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "update_available=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check brave
+        id: brave
+        run: |
+          CURRENT=$(grep '^version=' srcpkgs/brave/template | cut -d= -f2)
+          LATEST=$(curl -s https://api.github.com/repos/brave/brave-browser/releases/latest | jq -r .tag_name | sed 's/^v//')
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          if [ "$CURRENT" != "$LATEST" ]; then
+            echo "update_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "update_available=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check flclash
+        id: flclash
+        run: |
+          CURRENT=$(grep '^version=' srcpkgs/flclash/template | cut -d= -f2)
+          LATEST=$(curl -s https://api.github.com/repos/chen08209/FlClash/releases/latest | jq -r .tag_name | sed 's/^v//')
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          if [ "$CURRENT" != "$LATEST" ]; then
+            echo "update_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "update_available=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check peazip
+        id: peazip
+        run: |
+          CURRENT=$(grep '^version=' srcpkgs/peazip/template | cut -d= -f2)
+          LATEST=$(curl -s https://api.github.com/repos/peazip/PeaZip/releases/latest | jq -r .tag_name)
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          if [ "$CURRENT" != "$LATEST" ]; then
+            echo "update_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "update_available=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check lyargoos-welcome
+        id: lyargoos-welcome
+        run: |
+          CURRENT=$(grep '^version=' srcpkgs/lyargoos-welcome/template | cut -d= -f2)
+          LATEST=$(curl -s https://api.github.com/repos/Meniny/LyargoOS-Welcome/releases/latest | jq -r .tag_name | sed 's/^v//')
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          if [ "$CURRENT" != "$LATEST" ]; then
+            echo "update_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "update_available=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check lyargoos-xbps
+        id: lyargoos-xbps
+        run: |
+          CURRENT=$(grep '^version=' srcpkgs/lyargoos-xbps/template | cut -d= -f2)
+          LATEST=$(curl -s https://api.github.com/repos/Meniny/LyargoOS-XBPS/releases/latest | jq -r .tag_name | sed 's/^v//')
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          if [ "$CURRENT" != "$LATEST" ]; then
+            echo "update_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "update_available=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check lyargoos-artwork
+        id: lyargoos-artwork
+        run: |
+          CURRENT=$(grep '^version=' srcpkgs/lyargoos-artwork/template | cut -d= -f2)
+          LATEST=$(curl -s https://api.github.com/repos/Meniny/LyargoOS-Artworks/releases/latest | jq -r .tag_name | sed 's/^v//')
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          if [ "$CURRENT" != "$LATEST" ]; then
+            echo "update_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "update_available=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create issues for updates
+        if: always()
+        run: |
+          PACKAGES=("vscodium" "onlyoffice" "ungoogled-chromium" "zen" "brave" "flclash" "peazip" "lyargoos-welcome" "lyargoos-xbps" "lyargoos-artwork")
+          
+          for pkg in "${PACKAGES[@]}"; do
+            UPDATE_VAR="${pkg//-/_}_update_available"
+            if [ "${!UPDATE_VAR}" = "true" ]; then
+              CURRENT_VAR="${pkg//-/_}_current"
+              LATEST_VAR="${pkg//-/_}_latest"
+              CURRENT="${!CURRENT_VAR}"
+              LATEST="${!LATEST_VAR}"
+              
+              # Check if issue already exists
+              EXISTING=$(gh issue list --label "update-available" --state open --search "$pkg" --json number --jq '.[0].number')
+              
+              if [ -z "$EXISTING" ]; then
+                gh issue create \
+                  --title "Update $pkg to $LATEST" \
+                  --body "New version available for **$pkg**\n\nCurrent: \`$CURRENT\`\nLatest: \`$LATEST\`\n\nUpdate steps:\n1. Update \`version=\` in \`srcpkgs/$pkg/template\`\n2. Run \`xgensum -f srcpkgs/$pkg/template\` to update checksum\n3. Test build with \`./build.sh $pkg\`\n4. Commit and push" \
+                  --label "update-available"
+              fi
+            fi
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        run: |
+          echo "## Update Check Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Package | Current | Latest | Update Available |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|---------|--------|------------------|" >> $GITHUB_STEP_SUMMARY
+          
+          for pkg in vscodium onlyoffice ungoogled-chromium zen brave flclash peazip lyargoos-welcome lyargoos-xbps lyargoos-artwork; do
+            UPDATE_VAR="${pkg//-/_}_update_available"
+            CURRENT_VAR="${pkg//-/_}_current"
+            LATEST_VAR="${pkg//-/_}_latest"
+            
+            if [ "${!UPDATE_VAR}" = "true" ]; then
+              STATUS="✅ Yes"
+            else
+              STATUS="❌ No"
+            fi
+            
+            echo "| $pkg | \`${!CURRENT_VAR}\` | \`${!LATEST_VAR}\` | $STATUS |" >> $GITHUB_STEP_SUMMARY
+          done
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**wps-office**: Manual check required (uses custom CDN)" >> $GITHUB_STEP_SUMMARY

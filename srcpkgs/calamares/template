@@ -1,5 +1,4 @@
 # Template file for 'calamares'
-# Based on Noid Linux's calamares package
 pkgname=calamares
 version=3.4.2
 revision=1
@@ -23,18 +22,14 @@ makedepends="python3-devel python3-jsonschema yaml-cpp-devel
  qt6-webengine"
 depends="kconfig kcoreaddons kiconthemes ki18n kio ksolid boost
  ckbcomp polkit-qt6 gtk-update-icon-cache plasma-framework
- squashfs-tools libpwquality icu rsync python3"
+ squashfs-tools libpwquality icu rsync"
 short_desc="Distribution-independent installer framework"
-maintainer="LyargoOS Team <lyargoos@example.com>"
+maintainer="LyargoOS <meniny@qq.com>"
 license="BSD-2-Clause, CC-BY-4.0, CC0-1.0, GPL-3.0-or-later, LGPL-2.1-only, LGPL-3.0-or-later, MIT"
 homepage="https://calamares.io"
 changelog="https://codeberg.org/Calamares/calamares/releases/"
 distfiles="https://codeberg.org/Calamares/calamares/archive/v${version}.tar.gz"
-checksum=4e9bfa5e6fe50cb302d665bca98f9bdae71ff354ec8841f115773b386734fdc1
-
-if [ -n "$XBPS_CROSS_BUILD" ]; then
-	configure_args+=" -DQT_HOST_PATH_CMAKE_DIR=/usr/lib/cmake"
-fi
+checksum=7b8d0ee09645ad9d625baaebe0ba9ffd5baedbe92153347fd4d0a003a2d7639c
 
 post_install() {
 	vbin build/loadmodule
@@ -45,6 +40,6 @@ post_install() {
 	vinstall ${FILESDIR}/49-nopasswd-calamares.rules 644 etc/polkit-1/rules.d/
 
 	for license in BSD-2-Clause CC-BY-4.0 CC0-1.0 GPL-3.0-or-later LGPL-2.1-only LGPL-3.0-or-later MIT; do
-		vlicense LICENSES/${license}.txt
+	 vlicense LICENSES/${license}.txt
 	done
 }

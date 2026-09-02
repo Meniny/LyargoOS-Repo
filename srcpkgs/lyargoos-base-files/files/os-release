@@ -1,0 +1,9 @@
+NAME="LyargoOS"
+ID="lyargoos"
+PRETTY_NAME="LyargoOS"
+HOME_URL="https://github.com/Meniny/LyargoOS"
+DOCUMENTATION_URL="https://docs.voidlinux.org/"
+LOGO="lyargoos-logo"
+ANSI_COLOR="0;38;2;26;179;148"
+
+DISTRIB_ID="lyargoos"

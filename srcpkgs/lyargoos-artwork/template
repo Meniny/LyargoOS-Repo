@@ -4,7 +4,7 @@ version=0.1
 revision=1
 build_style=gnu-makefile
 short_desc="LyargoOS artwork — wallpapers, logos, splash screen"
-maintainer="LyargoOS <your@email.com>"
+maintainer="Meniny <meniny@qq.com>"
 license="CC-BY-4.0"
 homepage="https://github.com/Meniny/LyargoOS-Artworks"
 distfiles="https://github.com/Meniny/LyargoOS-Artworks/archive/refs/tags/v${version}.tar.gz"
@@ -30,6 +30,12 @@ do_install() {
 			[ -f "$f" ] || continue
 			install -m644 "$f" ${DESTDIR}/usr/share/pixmaps/
 		done
+		
+		# Install SVG icon to hicolor theme for KDE system info
+		if [ -f logos/lyargoos-logo.svg ]; then
+			vmkdir usr/share/icons/hicolor/scalable/apps
+			install -m644 logos/lyargoos-logo.svg ${DESTDIR}/usr/share/icons/hicolor/scalable/apps/
+		fi
 	fi
 
 	# Splash screen

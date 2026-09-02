@@ -86,6 +86,16 @@ echo "${CYAN}Title:${NC} $TITLE"
 echo "${CYAN}Notes:${NC} $NOTES"
 echo ""
 
+warn "Make sure you have built the packages first with ./build.sh"
+warn "Packages should be in void-packages/hostdir/binpkgs/"
+printf "${CYAN}Continue? [y/N]:${NC} "
+read -r CONTINUE_CHOICE
+if [ "$CONTINUE_CHOICE" != "y" ] && [ "$CONTINUE_CHOICE" != "Y" ]; then
+    echo "Aborted."
+    exit 0
+fi
+echo ""
+
 if [ ! -f "$PRIVKEY" ]; then
     error "private key not found at $PRIVKEY"
     echo "Run the key generation steps in README.md first" >&2
@@ -93,6 +103,22 @@ if [ ! -f "$PRIVKEY" ]; then
 fi
 
 cd "$STAGING"
+
+# Copy newly built packages from void-packages hostdir
+VOID_BINPKGS="$SCRIPT_DIR/void-packages/hostdir/binpkgs"
+if [ -d "$VOID_BINPKGS" ]; then
+    info "Copying newly built packages from void-packages..."
+    for pkg in "$VOID_BINPKGS"/*.xbps; do
+        if [ -f "$pkg" ]; then
+            pkgname=$(basename "$pkg" | sed 's/-[0-9].*//')
+            # Remove old versions of this package
+            rm -f "${pkgname}"-*.xbps 2>/dev/null || true
+            # Copy new version
+            cp "$pkg" .
+            echo "  Updated: $(basename "$pkg")"
+        fi
+    done
+fi
 
 info "Indexing x86_64 packages..."
 rm -f x86_64-repodata

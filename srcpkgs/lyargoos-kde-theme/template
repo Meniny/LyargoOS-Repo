@@ -5,7 +5,7 @@ revision=1
 build_style=gnu-makefile
 depends="breeze-icons"
 short_desc="LyargoOS KDE Plasma theme — color scheme, SDDM theme, desktop theme"
-maintainer="LyargoOS <your@email.com>"
+maintainer="Meniny <meniny@qq.com>"
 license="CC-BY-4.0"
 homepage="https://github.com/Meniny/LyargoOS-Artworks"
 # Same source as lyargoos-artwork — the KDE theme files live under kde/

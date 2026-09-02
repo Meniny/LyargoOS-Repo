@@ -9,7 +9,12 @@ Custom XBPS package repository for [LyargoOS](https://github.com/Meniny/LyargoOS
 | `brave` | Brave web browser | Upstream GitHub releases |
 | `calamares` | GUI installer (with runit patches for Void) | Upstream Codeberg + Void patches |
 | `flclash` | Multi-platform proxy client | Upstream AppImage |
+| `onlyoffice` | Office suite | Upstream GitHub releases |
 | `peazip` | File archiver and compressor | Upstream tarball |
+| `ungoogled-chromium` | Chromium without Google services | Upstream GitHub releases |
+| `vscodium` | Free/Libre VS Code binaries | Upstream GitHub releases |
+| `wps-office` | WPS Office suite | Upstream RPM |
+| `zen` | Zen Browser | Upstream GitHub releases |
 | `lyargoos-artwork` | Wallpapers, logos, splash | [LyargoOS-Artworks](https://github.com/Meniny/LyargoOS-Artworks) |
 | `lyargoos-calamares-config` | Calamares config and LyargoOS branding | [LyargoOS-Repo](https://github.com/Meniny/LyargoOS-Repo) |
 | `lyargoos-kde-theme` | KDE Plasma theme (color scheme, SDDM, desktop) | [LyargoOS-Artworks](https://github.com/Meniny/LyargoOS-Artworks) |
@@ -174,16 +179,16 @@ Then add packages to `BASE_PACKAGES` (for all flavors) or flavor-specific variab
 
 ## Mirror Configuration
 
-The default Void mirror (`repo-default.voidlinux.org`) may be slow depending on your location. Use `mirror.sh` to switch to a faster mirror for package builds.
+The default Void mirror (`repo-default.voidlinux.org`) may be slow depending on your location. Use `chmirror.sh` to switch to a faster mirror for package builds.
 
 ### Quick Method
 
 ```bash
 # Interactive menu
-./mirror.sh
+./chmirror.sh
 
 # Or specify directly
-./mirror.sh https://mirrors.tuna.tsinghua.edu.cn/voidlinux
+./chmirror.sh https://mirrors.tuna.tsinghua.edu.cn/voidlinux
 ```
 
 ### Common Mirrors
@@ -215,9 +220,8 @@ Edit `void-packages/etc/xbps.d/repos-remote*.conf` and replace `repo-default.voi
 lyargoos-repo/
 ├── README.md
 ├── build.sh                # Build packages via void-packages
-├── cleanup.sh              # Delete tags and releases (interactive)
-├── mirror.sh               # Switch XBPS mirror
-├── publish.sh              # Sign packages and publish to GitHub Releases
+├── chmirror.sh             # Switch XBPS mirror
+├── publish.sh              # Copy built packages, sign, and publish to GitHub Releases
 ├── xbps-fingerprint.c      # Fingerprint calculator (from XBPS source)
 ├── Makefile.fingerprint    # Build script for xbps-fingerprint
 ├── srcpkgs/
@@ -231,7 +235,20 @@ lyargoos-repo/
 │   ├── flclash/
 │   │   ├── template
 │   │   └── files/
+│   ├── onlyoffice/
+│   │   └── template
 │   ├── peazip/
+│   │   ├── template
+│   │   └── files/
+│   ├── ungoogled-chromium/
+│   │   ├── template
+│   │   └── files/
+│   ├── vscodium/
+│   │   ├── template
+│   │   └── files/
+│   ├── wps-office/
+│   │   └── template
+│   ├── zen/
 │   │   ├── template
 │   │   └── files/
 │   ├── lyargoos-artwork/
@@ -250,3 +267,16 @@ lyargoos-repo/
 - The `distfiles` URLs point to upstream releases — you need to fill in the `checksum` field after first download
 - Custom icons (SVG) can be placed in each package's `files/` directory
 - The `lyargoos-artwork` and `lyargoos-kde-theme` packages both fetch from the same `lyargoos-artwork` repo but install different files
+
+## Updating Packages
+
+When upstream releases a new version for packages like vscodium, onlyoffice, wps-office, ungoogled-chromium, or zen:
+
+1. Edit `srcpkgs/<pkg>/template` and update `version=`
+2. Regenerate checksum:
+   ```bash
+   xgensum -f srcpkgs/<pkg>/template
+   ```
+3. Commit and push — CI will build automatically
+
+The checksum is SHA256 of the source tarball from `distfiles=` URL. xbps-src verifies it during build.
