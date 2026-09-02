@@ -1,7 +1,7 @@
 # Template file for 'lyargoos-calamares-config'
 pkgname=lyargoos-calamares-config
 version=0.1.0
-revision=1
+revision=2
 short_desc="LyargoOS Calamares installer configuration"
 maintainer="Meniny <meniny@qq.com>"
 license="MIT"
@@ -16,6 +16,7 @@ do_install() {
 	# Branding
 	vmkdir etc/calamares/branding/lyargoos
 	vinstall ${FILESDIR}/branding.desc 644 etc/calamares/branding/lyargoos
+	vinstall ${FILESDIR}/stylesheet.qss 644 etc/calamares/branding/lyargoos
 
 	# Slideshow
 	vmkdir etc/calamares/branding/lyargoos/slideshow

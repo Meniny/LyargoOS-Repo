@@ -34,10 +34,10 @@ images:
   productWelcome:      "/usr/share/pixmaps/lyargoos-logo.svg"
 
 style:
-  SidebarBackground:        "#2a2e32"
-  SidebarText:              "#fcfcfc"
+  SidebarBackground:        "#1a1a2e"
+  SidebarText:              "#f0f0fa"
   SidebarTextCurrent:       "#ffffff"
-  SidebarBackgroundCurrent: "#3daee9"
+  SidebarBackgroundCurrent: "#e94560"
 
 slideshow: "slideshow/show.qml"
 slideshowAPI: 2
