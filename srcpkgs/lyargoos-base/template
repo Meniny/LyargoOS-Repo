@@ -4,8 +4,12 @@ pkgname=lyargoos-base
 version=0.1.0
 revision=1
 metapackage=yes
-depends="lyargoos-xbps lyargoos-artwork lyargoos-welcome"
 short_desc="LyargoOS base system meta-package"
 maintainer="LyargoOS <meniny@qq.com>"
 license="MIT"
 homepage="https://github.com/Meniny/LyargoOS"
+
+case "$XBPS_TARGET_MACHINE" in
+    x86_64)  depends="lyargoos-xbps lyargoos-artwork lyargoos-welcome" ;;
+    aarch64) depends="lyargoos-xbps lyargoos-artwork" ;;
+esac

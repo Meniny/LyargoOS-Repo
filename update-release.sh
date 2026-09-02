@@ -21,12 +21,21 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
 NC='\033[0m'
 
 info() { echo -e "${BLUE}==>${NC} $1"; }
 success() { echo -e "${GREEN}✓${NC} $1"; }
 warn() { echo -e "${YELLOW}⚠${NC} $1"; }
 error() { echo -e "${RED}✗${NC} $1" >&2; }
+
+# Highlight helpers
+hl_pkg() { echo -e "${MAGENTA}${BOLD}$1${NC}"; }
+hl_arch() { echo -e "${CYAN}$1${NC}"; }
+hl_ver() { echo -e "${YELLOW}$1${NC}"; }
+hl_file() { echo -e "${CYAN}${BOLD}$1${NC}"; }
 
 usage() {
     echo "Usage: $0 -t <tag> (-p <package> | -f <file>) ..."
@@ -47,6 +56,7 @@ usage() {
 TAG=""
 PKGS=""
 FILES=""
+PKG_FILES=""
 
 while getopts "t:p:f:h" opt; do
     case $opt in
@@ -66,6 +76,41 @@ fi
 if [ -z "$PKGS" ] && [ -z "$FILES" ]; then
     error "At least one package (-p) or file (-f) is required"
     usage
+fi
+
+# Show what will be processed and ask for confirmation BEFORE doing anything
+echo ""
+info "This script will:"
+echo "  - Remove old package versions from \"staging/\" folder"
+echo "  - Copy new packages from void-packages/hostdir/binpkgs/ to \"staging/\" folder"
+echo "  - Delete old assets from GitHub release $TAG"
+echo "  - Re-index and sign the repository"
+echo "  - Upload new packages to GitHub release $TAG"
+echo ""
+info "Update details:"
+if [ -n "$PKGS" ]; then
+    echo -n "  Packages: "
+    for pkg in $PKGS; do
+        echo -n "$(hl_pkg $pkg) "
+    done
+    echo ""
+fi
+if [ -n "$FILES" ]; then
+    echo -n "  Files: "
+    for file in $FILES; do
+        echo -n "$(hl_file $file) "
+    done
+    echo ""
+fi
+if [ -n "$TAG" ]; then
+    echo -e "  Tag: $(hl_ver $TAG)"
+fi
+echo ""
+read -p "Continue? [y/N] " -n 1 -r
+echo ""
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    error "Aborted by user"
+    exit 1
 fi
 
 if [ ! -f "$PRIVKEY" ]; then
@@ -98,13 +143,13 @@ if [ "$TAG" = "latest" ]; then
 fi
 
 # Verify release exists
-info "Verifying release $TAG exists..."
+info "Verifying release $(hl_ver $TAG) exists..."
 if ! gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
-    error "Release $TAG does not exist in $REPO"
+    error "Release $(hl_ver $TAG) does not exist in $REPO"
     error "Create it first with: ./publish.sh"
     exit 1
 fi
-success "Release $TAG found"
+success "Release $(hl_ver $TAG) found"
 
 VOID_BINPKGS="$SCRIPT_DIR/void-packages/hostdir/binpkgs"
 
@@ -112,45 +157,54 @@ cd "$STAGING"
 
 # Process packages by name
 for pkg in $PKGS; do
-    info "Processing package: $pkg"
+    echo ""
+    info "Processing package: $(hl_pkg $pkg)"
     
-    # Find the package in void-packages/hostdir/binpkgs
-    pkg_file=$(ls "$VOID_BINPKGS"/${pkg}-*.xbps 2>/dev/null | head -n1)
+    # Find all matching packages in void-packages/hostdir/binpkgs (all architectures)
+    pkg_files=$(ls "$VOID_BINPKGS"/${pkg}-*.xbps 2>/dev/null || true)
     
-    if [ -z "$pkg_file" ]; then
-        warn "No built package found for $pkg in $VOID_BINPKGS"
+    if [ -z "$pkg_files" ]; then
+        warn "No built package found for $(hl_pkg $pkg) in $VOID_BINPKGS"
         warn "Build it first with: ./build.sh -p $pkg"
         continue
     fi
     
-    pkg_basename=$(basename "$pkg_file")
-    info "Found: $pkg_basename"
-    
-    # Extract package name pattern (e.g., "qq-" from "qq-3.2.32_1.x86_64.xbps")
-    pkg_pattern=$(echo "$pkg_basename" | sed 's/-[0-9].*//')
-    
-    # Remove old versions from staging
-    info "Removing old versions from staging..."
-    for old_pkg in ${pkg_pattern}-*.xbps; do
-        if [ -f "$old_pkg" ]; then
-            rm -f "$old_pkg" "${old_pkg}.sig2" 2>/dev/null || true
-            echo "  Removed: $old_pkg"
-        fi
+    # Process each architecture
+    for pkg_file in $pkg_files; do
+        pkg_basename=$(basename "$pkg_file")
+        pkg_pattern=$(echo "$pkg_basename" | sed 's/-[0-9].*//')
+        pkg_arch=$(echo "$pkg_basename" | sed 's/\.xbps.*$//' | awk -F'.' '{print $NF}')
+        pkg_version=$(echo "$pkg_basename" | sed "s/^${pkg_pattern}-//" | sed 's/\.xbps.*//')
+        
+        info "Found: $(hl_file $pkg_basename) [$(hl_arch $pkg_arch)]"
+        
+        # Remove old versions from staging (matching this package pattern AND arch)
+        for old_pkg in ${pkg_pattern}-*.xbps; do
+            if [ -f "$old_pkg" ]; then
+                old_arch=$(echo "$old_pkg" | sed 's/\.xbps.*$//' | awk -F'.' '{print $NF}')
+                if [ "$old_arch" = "$pkg_arch" ]; then
+                    rm -f "$old_pkg" "${old_pkg}.sig2" 2>/dev/null || true
+                    echo -e "  ${RED}✗${NC} Removed old: $old_pkg"
+                fi
+            fi
+        done
+        
+        # Copy new package
+        cp "$pkg_file" .
+        echo -e "  ${GREEN}✓${NC} Copied: $pkg_basename"
+        
+        # Delete old assets from GitHub release (matching this package pattern AND arch)
+        NO_COLOR=1 gh release view "$TAG" --repo "$REPO" --json assets -q '.assets[].name' 2>/dev/null | grep "^${pkg_pattern}-" | while read asset; do
+            asset_arch=$(echo "$asset" | sed 's/\.xbps.*$//' | awk -F'.' '{print $NF}')
+            if [ "$asset_arch" = "$pkg_arch" ]; then
+                echo -e "  ${RED}🗑${NC} Deleting from release: $asset"
+                NO_COLOR=1 gh release delete-asset "$TAG" --repo "$REPO" "$asset" --yes 2>/dev/null || true
+            fi
+        done
+        
+        # Add to PKG_FILES for upload
+        PKG_FILES="$PKG_FILES $pkg_file"
     done
-    
-    # Copy new package
-    cp "$pkg_file" .
-    success "Copied: $pkg_basename"
-    
-    # Delete old assets from GitHub release
-    info "Deleting old assets from release $TAG..."
-    gh release view "$TAG" --repo "$REPO" --json assets -q '.assets[].name' | grep "^${pkg_pattern}-" | while read asset; do
-        echo "  Deleting: $asset"
-        gh release delete-asset "$TAG" --repo "$REPO" "$asset" --yes 2>/dev/null || true
-    done
-    
-    # Add to FILES for upload
-    FILES="$FILES $pkg_file"
 done
 
 # Process specific files
@@ -162,29 +216,35 @@ for file in $FILES; do
     
     file_basename=$(basename "$file")
     pkg_pattern=$(echo "$file_basename" | sed 's/-[0-9].*//')
+    file_arch=$(echo "$file_basename" | sed 's/\.xbps.*$//' | awk -F'.' '{print $NF}')
     
-    info "Processing file: $file_basename"
-    
-    # Remove old versions from staging
+    # Remove old versions from staging (same package pattern, same arch only)
     for old_pkg in ${pkg_pattern}-*.xbps; do
         if [ -f "$old_pkg" ] && [ "$old_pkg" != "$file_basename" ]; then
-            rm -f "$old_pkg" "${old_pkg}.sig2" 2>/dev/null || true
-            echo "  Removed: $old_pkg"
+            old_arch=$(echo "$old_pkg" | sed 's/\.xbps.*$//' | awk -F'.' '{print $NF}')
+            if [ "$old_arch" = "$file_arch" ]; then
+                rm -f "$old_pkg" "${old_pkg}.sig2" 2>/dev/null || true
+                echo -e "  ${RED}✗${NC} Removed old: $old_pkg"
+            fi
         fi
     done
     
     # Copy to staging if not already there
     if [ "$(dirname "$file")" != "$STAGING" ]; then
-        cp "$file" .
-        success "Copied: $file_basename"
+        if [ ! -f "$file_basename" ]; then
+            cp "$file" .
+            echo -e "  ${GREEN}✓${NC} Copied: $file_basename"
+        fi
     fi
     
-    # Delete old assets from GitHub release
-    info "Deleting old assets from release $TAG..."
-    gh release view "$TAG" --repo "$REPO" --json assets -q '.assets[].name' | grep "^${pkg_pattern}-" | while read asset; do
+    # Delete old assets from GitHub release (same arch only)
+    NO_COLOR=1 gh release view "$TAG" --repo "$REPO" --json assets -q '.assets[].name' 2>/dev/null | grep "^${pkg_pattern}-" | while read asset; do
         if [ "$asset" != "$file_basename" ]; then
-            echo "  Deleting: $asset"
-            gh release delete-asset "$TAG" --repo "$REPO" "$asset" --yes 2>/dev/null || true
+            asset_arch=$(echo "$asset" | sed 's/\.xbps.*$//' | awk -F'.' '{print $NF}')
+            if [ "$asset_arch" = "$file_arch" ]; then
+                echo -e "  ${RED}🗑${NC} Deleting from release: $asset"
+                NO_COLOR=1 gh release delete-asset "$TAG" --repo "$REPO" "$asset" --yes 2>/dev/null || true
+            fi
         fi
     done
 done
@@ -205,7 +265,7 @@ info "Re-signing repository..."
 xbps-rindex --privkey "$PRIVKEY" --sign --signedby "$SIGNEDBY" "$STAGING"
 
 info "Signing new packages..."
-for file in $FILES; do
+for file in $PKG_FILES $FILES; do
     file_basename=$(basename "$file")
     if [ -f "$file_basename" ] && [ ! -f "${file_basename}.sig2" ]; then
         xbps-rindex --privkey "$PRIVKEY" --sign-pkg "$file_basename"
@@ -213,27 +273,33 @@ for file in $FILES; do
 done
 
 # Upload updated files
-info "Uploading to release $TAG..."
+echo ""
+info "Uploading to release $(hl_ver $TAG)..."
 
-for file in $FILES; do
+# Combine PKG_FILES and FILES for upload
+ALL_FILES="$PKG_FILES $FILES"
+
+for file in $ALL_FILES; do
     file_basename=$(basename "$file")
+    file_arch=$(echo "$file_basename" | sed 's/\.xbps.*$//' | awk -F'.' '{print $NF}')
+    
     # Upload package file
     if [ -f "$file_basename" ]; then
-        info "Uploading: $file_basename"
-        gh release upload "$TAG" "$file_basename" --repo "$REPO" --clobber
+        echo -e "  ${GREEN}↑${NC} $file_basename [$file_arch]"
+        NO_COLOR=1 gh release upload "$TAG" "$file_basename" --repo "$REPO" --clobber 2>/dev/null
     fi
     # Upload signature if exists
     if [ -f "${file_basename}.sig2" ]; then
-        info "Uploading: ${file_basename}.sig2"
-        gh release upload "$TAG" "${file_basename}.sig2" --repo "$REPO" --clobber
+        echo -e "  ${GREEN}↑${NC} ${file_basename}.sig2"
+        NO_COLOR=1 gh release upload "$TAG" "${file_basename}.sig2" --repo "$REPO" --clobber 2>/dev/null
     fi
 done
 
 # Upload repodata files
 for repodata in *-repodata; do
     if [ -f "$repodata" ]; then
-        info "Uploading: $repodata"
-        gh release upload "$TAG" "$repodata" --repo "$REPO" --clobber
+        echo -e "  ${GREEN}↑${NC} $repodata"
+        NO_COLOR=1 gh release upload "$TAG" "$repodata" --repo "$REPO" --clobber 2>/dev/null
     fi
 done
 
