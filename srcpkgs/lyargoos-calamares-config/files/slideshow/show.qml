@@ -18,34 +18,41 @@ Presentation {
 
     Slide {
         anchors.fill: parent
-        Text {
+        Image {
+            source: "slide-01.jpg"
+            width: parent.width; height: parent.height
+            fillMode: Image.Stretch
             anchors.centerIn: parent
-            text: "Welcome to LyargoOS"
-            font.pixelSize: 36
-            font.bold: true
-            color: "#fcfcfc"
         }
     }
 
     Slide {
         anchors.fill: parent
-        Text {
+        Image {
+            source: "slide-02.jpg"
+            width: parent.width; height: parent.height
+            fillMode: Image.Stretch
             anchors.centerIn: parent
-            text: "Built on Void Linux"
-            font.pixelSize: 36
-            font.bold: true
-            color: "#fcfcfc"
         }
     }
 
     Slide {
         anchors.fill: parent
-        Text {
+        Image {
+            source: "slide-03.jpg"
+            width: parent.width; height: parent.height
+            fillMode: Image.Stretch
             anchors.centerIn: parent
-            text: "Fast, secure, and customizable"
-            font.pixelSize: 36
-            font.bold: true
-            color: "#fcfcfc"
+        }
+    }
+
+    Slide {
+        anchors.fill: parent
+        Image {
+            source: "slide-04.jpg"
+            width: parent.width; height: parent.height
+            fillMode: Image.Stretch
+            anchors.centerIn: parent
         }
     }
 

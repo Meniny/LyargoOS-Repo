@@ -22,6 +22,10 @@ do_install() {
 	# Slideshow
 	vmkdir etc/calamares/branding/lyargoos/slideshow
 	vinstall ${FILESDIR}/slideshow/show.qml 644 etc/calamares/branding/lyargoos/slideshow
+	vinstall ${FILESDIR}/slideshow/slide-01.jpg 644 etc/calamares/branding/lyargoos/slideshow
+	vinstall ${FILESDIR}/slideshow/slide-02.jpg 644 etc/calamares/branding/lyargoos/slideshow
+	vinstall ${FILESDIR}/slideshow/slide-03.jpg 644 etc/calamares/branding/lyargoos/slideshow
+	vinstall ${FILESDIR}/slideshow/slide-04.jpg 644 etc/calamares/branding/lyargoos/slideshow
 
 	# Module configs
 	vinstall ${FILESDIR}/services-runit.conf 644 etc/calamares/modules
@@ -33,4 +37,10 @@ do_install() {
 	vinstall ${FILESDIR}/finished.conf 644 etc/calamares/modules
 	vinstall ${FILESDIR}/shellprocess-setshell.conf 644 etc/calamares/modules
 	vinstall ${FILESDIR}/unpackfs.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/machineid.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/bootloader.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/dracut.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/grubcfg.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/localecfg.conf 644 etc/calamares/modules
+	vinstall ${FILESDIR}/displaymanager.conf 644 etc/calamares/modules
 }
