@@ -198,7 +198,9 @@ for pkg in $PKGS; do
             asset_arch=$(echo "$asset" | sed 's/\.xbps.*$//' | awk -F'.' '{print $NF}')
             if [ "$asset_arch" = "$pkg_arch" ]; then
                 echo -e "  ${RED}🗑${NC} Deleting from release: $asset"
-                NO_COLOR=1 gh release delete-asset "$TAG" --repo "$REPO" "$asset" --yes 2>/dev/null || true
+                if ! NO_COLOR=1 gh release delete-asset "$TAG" --repo "$REPO" "$asset" --yes >/dev/null 2>&1; then
+                    error "Failed to delete $asset from release"
+                fi
             fi
         done
         
@@ -243,7 +245,9 @@ for file in $FILES; do
             asset_arch=$(echo "$asset" | sed 's/\.xbps.*$//' | awk -F'.' '{print $NF}')
             if [ "$asset_arch" = "$file_arch" ]; then
                 echo -e "  ${RED}🗑${NC} Deleting from release: $asset"
-                NO_COLOR=1 gh release delete-asset "$TAG" --repo "$REPO" "$asset" --yes 2>/dev/null || true
+                if ! NO_COLOR=1 gh release delete-asset "$TAG" --repo "$REPO" "$asset" --yes >/dev/null 2>&1; then
+                    error "Failed to delete $asset from release"
+                fi
             fi
         fi
     done
@@ -286,12 +290,18 @@ for file in $ALL_FILES; do
     # Upload package file
     if [ -f "$file_basename" ]; then
         echo -e "  ${GREEN}↑${NC} $file_basename [$file_arch]"
-        NO_COLOR=1 gh release upload "$TAG" "$file_basename" --repo "$REPO" --clobber 2>/dev/null
+        if ! NO_COLOR=1 gh release upload "$TAG" "$file_basename" --repo "$REPO" --clobber >/dev/null 2>&1; then
+            error "Failed to upload $file_basename"
+            exit 1
+        fi
     fi
     # Upload signature if exists
     if [ -f "${file_basename}.sig2" ]; then
         echo -e "  ${GREEN}↑${NC} ${file_basename}.sig2"
-        NO_COLOR=1 gh release upload "$TAG" "${file_basename}.sig2" --repo "$REPO" --clobber 2>/dev/null
+        if ! NO_COLOR=1 gh release upload "$TAG" "${file_basename}.sig2" --repo "$REPO" --clobber >/dev/null 2>&1; then
+            error "Failed to upload ${file_basename}.sig2"
+            exit 1
+        fi
     fi
 done
 
@@ -299,7 +309,10 @@ done
 for repodata in *-repodata; do
     if [ -f "$repodata" ]; then
         echo -e "  ${GREEN}↑${NC} $repodata"
-        NO_COLOR=1 gh release upload "$TAG" "$repodata" --repo "$REPO" --clobber 2>/dev/null
+        if ! NO_COLOR=1 gh release upload "$TAG" "$repodata" --repo "$REPO" --clobber >/dev/null 2>&1; then
+            error "Failed to upload $repodata"
+            exit 1
+        fi
     fi
 done
 
