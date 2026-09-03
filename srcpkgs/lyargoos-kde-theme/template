@@ -10,7 +10,7 @@ license="CC-BY-4.0"
 homepage="https://github.com/Meniny/LyargoOS-Artworks"
 # Same source as lyargoos-artwork — the KDE theme files live under kde/
 distfiles="https://github.com/Meniny/LyargoOS-Artworks/archive/refs/tags/v${version}.tar.gz"
-checksum=90d975714b758300b68e260db8775bfc70ce7290e91bc4b33a90b36d3cf73991
+checksum=65fee3154f582722b3434dca19e84e5ebbff012339a22371758b962d170bc8f7
 wrksrc="LyargoOS-Artworks-${version}"
 nostrip=yes
 
