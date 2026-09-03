@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=LocalSend
+Exec=localsend %u
+Icon=localsend
+Type=Application
+Terminal=false
+Categories=Utility;FileTransfer;Network;
+Comment=Share files with nearby devices
+MimeType=x-scheme-handler/localsend;

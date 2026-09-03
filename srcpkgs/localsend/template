@@ -1,0 +1,37 @@
+# Template file for 'localsend'
+pkgname=localsend
+version=1.18.2
+revision=1
+archs="x86_64 aarch64"
+depends="gtk+3"
+short_desc="Share files with nearby devices"
+maintainer="Meniny <meniny@qq.com>"
+license="MIT"
+homepage="https://localsend.org/"
+case "$XBPS_TARGET_MACHINE" in
+    x86_64)
+        distfiles="https://github.com/localsend/localsend/releases/download/v${version}/LocalSend-${version}-linux-x86-64.tar.gz"
+        checksum=287690a9a8eb6da9c83cc97b3e3030ac67daf32a7331fcf307d0939300658d16
+        ;;
+    aarch64)
+        distfiles="https://github.com/localsend/localsend/releases/download/v${version}/LocalSend-${version}-linux-arm-64.tar.gz"
+        checksum=dd61f74f1ce3f4e25aca41cd3ce650d6a99353d7baba81a8139807275b88e606
+        ;;
+esac
+nostrip=yes
+
+do_install() {
+	vmkdir opt/localsend
+	vcopy "*" opt/localsend
+
+	vmkdir usr/bin
+	cat > ${DESTDIR}/usr/bin/localsend << 'WRAPPER'
+#!/bin/sh
+cd /opt/localsend
+LD_LIBRARY_PATH=lib exec ./localsend_app "$@"
+WRAPPER
+	chmod 755 ${DESTDIR}/usr/bin/localsend
+
+	vinstall ${FILESDIR}/localsend.desktop 644 usr/share/applications
+	vinstall ${FILESDIR}/localsend.svg 644 usr/share/icons/hicolor/scalable/apps
+}

@@ -1,0 +1,28 @@
+# Template file for 'localsend-cli'
+pkgname=localsend-cli
+version=1.18.2
+revision=1
+archs="x86_64 aarch64"
+short_desc="CLI for LocalSend - share files with nearby devices"
+maintainer="Meniny <meniny@qq.com>"
+license="MIT"
+homepage="https://localsend.org/"
+case "$XBPS_TARGET_MACHINE" in
+    x86_64)
+        distfiles="https://github.com/localsend/localsend/releases/download/v${version}/LocalSend-CLI-${version}-linux-x86-64.tar.gz"
+        checksum=f5a986e0b4701b9aafeb9747225a2f3e314e97aba61b3dd7c9d076226f512b08
+        ;;
+    aarch64)
+        distfiles="https://github.com/localsend/localsend/releases/download/v${version}/LocalSend-CLI-${version}-linux-arm-64.tar.gz"
+        checksum=b003e9837743470f7a423ca1205e664031ce3d2e865acc692f3e47577ea93f6d
+        ;;
+esac
+nostrip=yes
+
+do_install() {
+	vmkdir opt/localsend-cli
+	vcopy "*" opt/localsend-cli
+
+	vmkdir usr/bin
+	ln -sf /opt/localsend-cli/localsend-cli ${DESTDIR}/usr/bin/localsend-cli
+}

@@ -92,6 +92,19 @@ jobs:
             echo "update_available=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Check localsend
+        id: localsend
+        run: |
+          CURRENT=$(grep '^version=' srcpkgs/localsend/template | cut -d= -f2)
+          LATEST=$(curl -s https://api.github.com/repos/localsend/localsend/releases/latest | jq -r .tag_name | sed 's/^v//')
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          if [ "$CURRENT" != "$LATEST" ]; then
+            echo "update_available=true" >> $GITHUB_OUTPUT
+          else
+            echo "update_available=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Check peazip-qt6
         id: peazip-qt6
         run: |
@@ -147,7 +160,7 @@ jobs:
       - name: Create issues for updates
         if: always()
         run: |
-          PACKAGES=("vscodium" "onlyoffice" "ungoogled-chromium" "zen" "brave" "flclash" "peazip-qt6" "lyargoos-welcome" "lyargoos-xbps" "lyargoos-artwork")
+          PACKAGES=("vscodium" "onlyoffice" "ungoogled-chromium" "zen" "brave" "flclash" "localsend" "peazip-qt6" "lyargoos-welcome" "lyargoos-xbps" "lyargoos-artwork")
           
           for pkg in "${PACKAGES[@]}"; do
             UPDATE_VAR="${pkg//-/_}_update_available"
@@ -178,7 +191,7 @@ jobs:
           echo "| Package | Current | Latest | Update Available |" >> $GITHUB_STEP_SUMMARY
           echo "|---------|---------|--------|------------------|" >> $GITHUB_STEP_SUMMARY
           
-          for pkg in vscodium onlyoffice ungoogled-chromium zen brave flclash peazip-qt6 lyargoos-welcome lyargoos-xbps lyargoos-artwork; do
+          for pkg in vscodium onlyoffice ungoogled-chromium zen brave flclash localsend peazip-qt6 lyargoos-welcome lyargoos-xbps lyargoos-artwork; do
             UPDATE_VAR="${pkg//-/_}_update_available"
             CURRENT_VAR="${pkg//-/_}_current"
             LATEST_VAR="${pkg//-/_}_latest"
