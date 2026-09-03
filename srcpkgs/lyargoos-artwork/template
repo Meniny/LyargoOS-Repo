@@ -31,11 +31,17 @@ do_install() {
 			install -m644 "$f" ${DESTDIR}/usr/share/pixmaps/
 		done
 		
-		# Install SVG icon to hicolor theme for KDE system info
+		# Install SVG icons to hicolor theme
 		if [ -f logos/lyargoos-logo.svg ]; then
 			vmkdir usr/share/icons/hicolor/scalable/apps
 			install -m644 logos/lyargoos-logo.svg ${DESTDIR}/usr/share/icons/hicolor/scalable/apps/
 		fi
+	fi
+
+	# Icons
+	if [ -f icons/lyargoos-installer.svg ]; then
+		vmkdir usr/share/icons/hicolor/scalable/apps
+		install -m644 icons/lyargoos-installer.svg ${DESTDIR}/usr/share/icons/hicolor/scalable/apps/
 	fi
 
 	# Splash screen
