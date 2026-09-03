@@ -8,7 +8,7 @@ maintainer="Meniny <meniny@qq.com>"
 license="CC-BY-4.0"
 homepage="https://github.com/Meniny/LyargoOS-Artworks"
 distfiles="https://github.com/Meniny/LyargoOS-Artworks/archive/refs/tags/v${version}.tar.gz"
-checksum=65fee3154f582722b3434dca19e84e5ebbff012339a22371758b962d170bc8f7
+checksum=b7479d5f4ac705ebfce0c0a9690a67fe1b393102d54c7ee5b141f1f91dab0cfb
 wrksrc="LyargoOS-Artworks-${version}"
 nostrip=yes
 
